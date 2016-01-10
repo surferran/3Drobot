@@ -127,13 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\..\..\..\RAN\FastVideoSegment\Code\External\TurboPixels\lsmlib\FMM_Core.h" />
     <ClInclude Include="..\src\frameFunctions.h" />
     <ClInclude Include="..\src\OdroidC1_handlers\pwm.h" />
     <ClInclude Include="..\src\utilFunctions.h" />
     <ClInclude Include="..\src\working_consts.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\externals\stereocalibrate.cpp" />
     <ClCompile Include="..\src\MainFile.cpp" />
     <ClCompile Include="..\src\OdroidC1_handlers\pwm.cpp" />
   </ItemGroup>

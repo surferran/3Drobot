@@ -22,7 +22,7 @@ const char rec_file_name[3][CHAR_LEN]	= { "output_1.avi" , "output_2.avi", "outp
 //const char rec_file_name[3][CHAR_LEN] = { "output_1.mp4" , "output_2.avi", "output_3.avi" };
 const char window_name[3][CHAR_LEN]		= { "out_1" , "out_2", "out_3" };
 
-const WORKING_MODES working_mode = REGULAR; // PLAYBACK;// REG_and_REC;
+const WORKING_MODES working_mode =  PLAYBACK;// REG_and_REC;//REGULAR; //
 const FRAME_SIZES	frame_size   = SMALL;
 
 //---------------------------------------------------

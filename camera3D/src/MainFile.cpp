@@ -1,6 +1,6 @@
 //// 3D stero robot (RoboDog)
 // Usage :
-//	remark below the desired frame function : taken frin '"frameFunctions.h"  '
+//	remark below the desired frame function : taken from '"frameFunctions.h"  '
 //  all main constants are set in the file '"working_consts.h"'
 
 // TODO : 
@@ -15,11 +15,13 @@
 #include "working_consts.h"
 #include "utilFunctions.h"
 // dont #include "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\CODE\example\objectDetection.cpp"
-#include "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\src\externals\BackgroundSub.cpp" // tried
-#include "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\src\externals\stitching_detailed.cpp" // tried
+#include "externals\BackgroundSub.cpp" // tried
+#include "externals\stitching_detailed.cpp" // tried
 //#include "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\src\externals\tracker.cpp"
-#include "externals\not_yet\stereo_calib.cpp"
+///#include "externals\not_yet\stereo_calib.cpp"
 #include "externals\not_yet\optical_flow_demo.cpp"
+//#include "externals\stereocalibrate.cpp" - included in project workspace
+int main_stero_calib(int argc, char* argv[], VideoCapture c[]); // declare for the CPP already included file
 
 // Need to include this for serial port communication
 //#include <Windows.h>
@@ -37,36 +39,6 @@ void process_frame(Mat *inFrame, Mat *outFrame)
 	// remove background
 
 }
-/*
-void open_com() {          //serial
-	// Setup serial port connection and needed variables.
-	HANDLE hSerial = CreateFile(L"COM3", GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-
-	if (hSerial != INVALID_HANDLE_VALUE)
-	{
-		printf("Port opened! \n");
-
-		DCB dcbSerialParams;
-		GetCommState(hSerial, &dcbSerialParams);
-
-		dcbSerialParams.BaudRate = CBR_9600;
-		dcbSerialParams.ByteSize = 8;
-		dcbSerialParams.Parity = NOPARITY;
-		dcbSerialParams.StopBits = ONESTOPBIT;
-
-		SetCommState(hSerial, &dcbSerialParams);
-	}
-	else
-	{
-		if (GetLastError() == ERROR_FILE_NOT_FOUND)
-		{
-			printf("Serial port doesn't exist! \n");
-		}
-
-		printf("Error while setting up serial port! \n");
-	}
-}
-*/
 
 int main(int argc, char** argv)
 {
@@ -75,7 +47,7 @@ int main(int argc, char** argv)
 	VideoWriter     videos[numOfActiveCams];		// set the recordings buffers
 	Mat				raw_frame[numOfActiveCams];
 	Mat				modeified_frame;
-
+	int				frame_max[numOfActiveCams];		// used for playback  // TODO: put in a struct of CamProperties 
 	// from 'BackgroundSub.cpp'
 	///show_forgnd_and_bgnd();
 
@@ -94,9 +66,11 @@ int main(int argc, char** argv)
 	imshow("visibleResult", visibleResult);*/
 	//waitKey(); 
 
+	/*
 	do_example_for_optical_flow();
 	cvWaitKey(0);
 	return 0;
+	*/
 
 	//while (waitKey(loop_DELAY) == 0) break;
 	//////return 0;
@@ -120,6 +94,7 @@ int main(int argc, char** argv)
 		{
 			double frame_width  = cams[0].get(CV_CAP_PROP_FRAME_WIDTH);
 			double frame_height = cams[0].get(CV_CAP_PROP_FRAME_HEIGHT);
+			frame_max[j]		= cams[j].get(CV_CAP_PROP_FRAME_COUNT);
 		}
 		else
 		{
@@ -132,17 +107,23 @@ int main(int argc, char** argv)
 	}
 
 
-	do_stereo_calib(argc, argv);
+//	do_stereo_calib(argc, argv);
+	main_stero_calib(argc, argv, cams);
+	return 1;
 
 	//Create a black image with the size as the camera output
 	//Mat imgLines = Mat::zeros(raw_frame[0].size(), CV_8UC3);;
-
-	set_controls_gui();
+	int currentFrameIndex[numOfActiveCams];
+	set_controls_gui(frame_max);
 
 	/// dont main1();
 	int frames_index = 0;
 	Mat *register_frames[2] ; register_frames[0] = &raw_frame[0]; // using only the 1st camera , if any
 	Mat output_blended_img;
+
+	stringstream  fileName;
+	int output_frame_index = 0;
+
 	while (1)
 	{
 		for (j = 0; j < numOfActiveCams; j++) {
@@ -157,13 +138,36 @@ int main(int argc, char** argv)
 			else
 			{
 				if (j == 0) frames_index++;
+				currentFrameIndex[j] = cams[j].get(CV_CAP_PROP_POS_FRAMES);
+				if (j == 0) Foo(currentFrameIndex[j]);
 
 				process_frame(&raw_frame[j], &modeified_frame);
 
-				imshow(window_name[j], modeified_frame);
+				imshow(window_name[j], modeified_frame);		// TODO: set those on top
 
 				videos[j].write(modeified_frame); 			// add 	if (working_mode == REG_and_REC) ?
-
+				if (working_mode == PLAYBACK)				waitKey(2.0*loop_DELAY) ;
+// for calibration : for specific frame indeces  - save the images. of both videoes.
+				if (working_mode == PLAYBACK) {
+					if ((frames_index == 38) || 
+						(frames_index == 45) || 
+						(frames_index == 95) ||
+						(frames_index == 111) ||
+						(frames_index == 140) ||
+						(frames_index == 159) ||
+						(frames_index == 198) ||
+						(frames_index == 252) ||
+						(frames_index == 261) ||
+						(frames_index == 300)) {
+						// save images //https://cal-linux.com/tutorials/strings.html
+						//http://stackoverflow.com/questions/15870612/saving-an-image-sequence-from-video-using-opencv2 
+						fileName.str("");
+						//fileName << "../src/output_images/out_chess_" << j << "_"<< output_frame_index<< ".jpg" ;  //frameindex+j
+						fileName << "../run_outputs/output_images/out_chess_" << output_frame_index << "_"<< j<< ".jpg" ;  //frameindex+j
+						imwrite(fileName.str(), raw_frame[j]);
+						if (j==numOfActiveCams-1) output_frame_index++;
+					}
+				}
 				if (numOfActiveCams == 1) {
 					if ((frames_index > 1)
 						&& (frames_index % stitching_frame_rate == 0))

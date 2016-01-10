@@ -1,9 +1,16 @@
-﻿Build started 6/01/2016 06:15:23.
-     1>Project "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\camera3D\camera3D.vcxproj" on node 2 (Build target(s)).
-     1>Link:
-         camera3D.vcxproj -> C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\Debug\camera3D.exe
-     1>Done Building Project "C:\Users\Ran_the_User\Documents\Technion_Studies\2016_A_winter\01_STEREO_cam_car_PROJECT\Code\camera3D\camera3D\camera3D.vcxproj" (Build target(s)).
+﻿Build started 10/01/2016 03:44:06.
+     1>Project "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\camera3D\camera3D.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\externals\stereocalibrate.cpp
+         stereocalibrate.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\stereocalibrate.cpp(29): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.exe" /INCREMENTAL /NOLOGO opencv_calib3d300d.lib opencv_core300d.lib opencv_features2d300d.lib opencv_flann300d.lib opencv_hal300d.lib opencv_highgui300d.lib opencv_imgcodecs300d.lib opencv_imgproc300d.lib opencv_ml300d.lib opencv_objdetect300d.lib opencv_photo300d.lib opencv_shape300d.lib opencv_stitching300d.lib opencv_superres300d.lib opencv_ts300d.lib opencv_video300d.lib opencv_videoio300d.lib opencv_videostab300d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.lib" /MACHINE:X86 Debug\stereocalibrate.obj
+         Debug\MainFile.obj
+         Debug\pwm.obj
+         camera3D.vcxproj -> C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.exe
+     1>Done Building Project "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\camera3D\camera3D.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.06
+Time Elapsed 00:00:02.28
