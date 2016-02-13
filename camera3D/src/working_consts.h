@@ -1,3 +1,7 @@
+#ifndef WORKING_CONSTS_H
+#define WORKING_CONSTS_H
+
+using namespace cv;
 
 enum WORKING_MODES	{ CALIBRATION=0, REGULAR  , REG_and_REC , PLAYBACK }; //  REGULAR(=no recording) 
 enum FRAME_SIZES	{ SMALL=0, MEDIUM , LARGE};
@@ -25,34 +29,66 @@ const char window_name[3][CHAR_LEN]		= { "out_1" , "out_2", "out_3" };
 const WORKING_MODES working_mode =  PLAYBACK;// REG_and_REC;//REGULAR; //
 const FRAME_SIZES	frame_size   = SMALL;
 
-//---------------------------------------------------
+const String STEREO_CALIBRATION_FILE_NAME = "mystereocalib.yml";
+//
+//struct CalibStruct {
+//	Mat
+//		CM1, CM2,
+//		D1, D2,
+//		R,
+//		T,
+//		E,
+//		F,
+//		R1, R2,
+//		P1, P2,
+//		Q;
+//};
 
-class CMyCam
-{
-public:
-	CMyCam(int HW_cam_index);					// size by default application definition.
-	CMyCam(int HW_cam_index, FRAME_SIZES size); // overloading. size by var input
-	~CMyCam();
-
-	//get_cam_properties(j);
-
-private:
-	VideoCapture	cam;
-	int				HW_cam_index;
-	int				w, h;
-	char			window_name[CHAR_LEN];
+struct CalibStruct {
+	Size imSize;
+	Mat
+		CM1, CM2,	// cameraMatrix1,2
+		D1, D2,		// distCoeffs1,2   //need to add calibrated imageSize
+		R,
+		T,
+		E,
+		F,
+		R1, R2,
+		P1, P2,
+		Q;
 };
 
-CMyCam::CMyCam(int HW_cam_index)
-{
 
-}
+//---------------------------------------------------
+//
+//class CMyCam
+//{
+//public:
+//	CMyCam(int HW_cam_index);					// size by default application definition.
+//	CMyCam(int HW_cam_index, FRAME_SIZES size); // overloading. size by var input
+//	~CMyCam();
+//
+//	//get_cam_properties(j);
+//
+//private:
+//	VideoCapture	cam;
+//	int				HW_cam_index;
+//	int				w, h;
+//	char			window_name[CHAR_LEN];
+//};
+//
+//CMyCam::CMyCam(int HW_cam_index)
+//{
+//
+//}
+//
+//CMyCam::CMyCam(int HW_cam_index, FRAME_SIZES size)
+//{
+//
+//}
+//
+//CMyCam::~CMyCam()
+//{
+//}
 
-CMyCam::CMyCam(int HW_cam_index, FRAME_SIZES size)
-{
-
-}
-
-CMyCam::~CMyCam()
-{
-}
+#endif //WORKING_CONSTS_H

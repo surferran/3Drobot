@@ -1,0 +1,16 @@
+option 1:
+
+..\src\externals\bgnd_sub\pic_set\20151212_075744.jpg ..\src\externals\bgnd_sub\pic_set\20151212_075748.jpg ..\src\externals\bgnd_sub\pic_set\20151212_075751.jpg ..\src\externals\bgnd_sub\pic_set\20151212_075753.jpg --features  orb
+
+option 2:
+
+../src/fileList.txt 5 8 1 L
+../src/fileList.txt 3 6 1.0 L
+../src/fileList_L.txt 9 6 1.0 L
+../src/fileList_R.txt 9 6 1.0 R
+../src/fileList.txt 9 6 1.0
+
+option 3:
+-w 1.0 -h 1.0 listFile.txt
+
+../src/imList.xml -w 9 -h 6 

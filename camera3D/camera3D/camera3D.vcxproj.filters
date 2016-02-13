@@ -36,14 +36,14 @@
     <ClInclude Include="..\src\utilFunctions.h">
       <Filter>Source Files\general</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\stereo_calib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MainFile.cpp" />
     <ClCompile Include="..\src\OdroidC1_handlers\pwm.cpp">
       <Filter>Source Files\hardware</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\externals\stereocalibrate.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,0 +1,177 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Deutsch (Deutschland) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
+#ifdef _WIN32
+LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_USINGOPENCV         ICON                    "UsingOpenCV.ico"
+IDI_SMALL               ICON                    "small.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_USINGOPENCV MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Load Movie",                  IDM_LOAD_MOV		
+		MENUITEM "Stop Movie",                 IDM_STOP_MOVIE
+		//MENUITEM "Movie to Pics",               IDM_MOVIE_TO_PICS
+		//MENUITEM "Pics to Movie",               IDM_GRAB_PICS
+        MENUITEM "Close Program",                     IDM_EXIT
+    END
+    POPUP "&Select Command"
+    BEGIN
+        MENUITEM "Play Movie",                  IDM_PLAY_MOV
+		MENUITEM "Save Movie",					IDM_WRITE_MOV
+       
+    END
+//	POPUP "&Special"
+//    BEGIN
+//        MENUITEM "Show Loaded Files",            IDM_SHOW_FILES
+//    END
+    POPUP "&Author"
+    BEGIN
+        MENUITEM "&Info",                       IDM_ABOUT
+    END
+END
+
+
+
+IDD_ABOUTBOX DIALOG  22, 17, 230, 75
+STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "Info"
+FONT 8, "System"
+BEGIN
+    ICON            IDI_USINGOPENCV,IDC_MYICON,14,9,16,16
+    LTEXT           "Manipulating Videos with OpenCV",IDC_STATIC,49,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Markus Koppensteiner 2012/2013",IDC_STATIC,49,20,119,8
+    DEFPUSHBUTTON   "OK",IDOK,195,6,30,11,WS_GROUP
+END
+
+
+// DIALOG to display loaded files
+//
+
+ID_DIA_LOADED_FILES DIALOGEX 0, 0, 249, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "FILES"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LISTBOX         ID_LST_LOADED_FILES,7,7,151,168,LBS_NOINTEGRALHEIGHT | 
+                    WS_VSCROLL | WS_TABSTOP //| LBS_HASSTRINGS | LBS_SORT
+    PUSHBUTTON   "CLOSE",IDC_CLOSE_LOADED_FILES,195,6,30,11
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDC_USINGOPENCV ACCELERATORS 
+BEGIN
+    "?",            IDM_ABOUT,              ASCII,  ALT
+    "/",            IDM_ABOUT,              ASCII,  ALT
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    32800, DIALOG
+    BEGIN
+        RIGHTMARGIN, 239
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_APP_TITLE           "Intro to OpenCV II (By M.Koppensteiner)"
+    IDC_USINGOPENCV         "USINGOPENCV"
+END
+
+#endif    // Deutsch (Deutschland) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

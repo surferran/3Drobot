@@ -1,0 +1,22 @@
+﻿Build started 13/02/2016 04:22:32.
+     1>Project "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\src\externals\wxopencv\wxopencv\wxopencv.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I"C:\wxWidgets-2.6.3\lib\vc_lib\mswd" /I"C:\wxWidgets-2.6.3\include" /I. /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _VC80_UPGRADE=0x0600 /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo".\Debug\\" /Fd".\Debug\vc140.pdb" /FR".\Debug\\" /Gd /TP /analyze- /errorReport:prompt camera\camera.cpp gui\about.cpp gui\camview.cpp gui\frame.cpp worker.cpp wxopencv.cpp
+         wxopencv.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\wxopencv.cpp(10): fatal error C1083: Cannot open include file: 'opencv2/opencv.hpp': No such file or directory
+         worker.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\worker.cpp(25): fatal error C1083: Cannot open include file: 'wx/wxprec.h': No such file or directory
+         frame.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\gui\frame.cpp(20): fatal error C1083: Cannot open include file: 'highgui.h': No such file or directory
+         camview.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\gui\camview.cpp(15): fatal error C1083: Cannot open include file: 'highgui.h': No such file or directory
+         about.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\gui\about.cpp(16): fatal error C1083: Cannot open include file: 'wx/wxprec.h': No such file or directory
+         camera.cpp
+     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\externals\wxopencv\wxopencv\camera\camera.cpp(19): fatal error C1083: Cannot open include file: 'highgui.h': No such file or directory
+         Generating Code...
+     1>Done Building Project "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\src\externals\wxopencv\wxopencv\wxopencv.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.39
