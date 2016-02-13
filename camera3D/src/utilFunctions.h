@@ -10,20 +10,30 @@ But HSV color space is the most suitable color space for color based image segme
 So, in the above application, I have converted the color space of original image of the video from BGR to HSV image
 */
 //////////
-//#include "c:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\src\stereo_calib.cpp"
 
-//#include "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\src\stereo_calib.cpp"
-////int do_stereo_calib(int argc, char** argv); // declare for the CPP already included file
-//int do_stereo_calib(int argc, char** argv);
+#include "stereo_calib.h"
 
-#include ".\stereo_calib.h"
+/* functions headers */
+void on_BarChange_user_selection(int newPos);
+void on_BarChange_launch(int newPos);
+void show_calibration_gui();
+void launch_calibration();
+void set_controls_gui(int frameMax[]);
 
 /* constants */
-enum USER_STATUS_SELECTION { CALIBRATION_RIGHT = 1,		// don't use it as a seperate mode
-							 CALIBRATION_LEFT	,		// don't use it as a seperate mode
-							 CALIBRATION_STEREO	,	// just use this one
-							 STREAM_LIVE_FROM_STEREO
-							};
+enum USER_STATUS_SELECTION {
+	CALIBRATION_RIGHT			= 1 ,		// don't use it as a seperate mode
+	CALIBRATION_LEFT				,		// don't use it as a seperate mode
+	CALIBRATION_STEREO				,		// just use this one
+	CAPTURE_CALIBRATION_IMAGES		,
+	STREAM_LIVE_FROM_STEREO
+};
+
+enum VIDEO_SOURCE {					// each 2 images will be populated from 
+	STREAM_STEREO_CAMS		= 1 ,		// real-time capture 
+	RECORDED_VIDEOS_COUPLE		,		// ready-made couple of video files
+	IMAGES_LIST							// pairs of pre-captured Left-Right images
+};
 
 /* globals */
 int operation_option = 0;
@@ -43,11 +53,11 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 	if ((CALIBRATION_STEREO == operation_option) && (1 == launch_status))
 	{
 		std::cout << "user selected to launch calibration . starting.. " << std::endl;
-
+		launch_calibration();
 	}
-
 }
-void show_calibration_gui()
+
+void show_user_gui()
 {
 	String WinName = "User Controls";
 	namedWindow(WinName, CV_WINDOW_AUTOSIZE); //create a window 
@@ -59,9 +69,9 @@ void show_calibration_gui()
 	posTrackBar = cvCreateTrackbar("change to launch program", "User Controls", &launch_status		, 1, on_BarChange_launch);
 	// TODO: add text to show working directory. 
 			// and calibration files directory.
-			//
-
+			// and options possibilities (the enum)
 }
+
 void launch_calibration()
 {
 	enum USER_STATUS_SELECTION {
@@ -70,6 +80,9 @@ void launch_calibration()
 		CALIBRATION_STEREO,	// just use this one
 		STREAM_LIVE_FROM_STEREO
 	};
+
+	int		argc;
+	char*	argv[6];
 
 	if (CALIBRATION_RIGHT == operation_option)
 	{
@@ -81,31 +94,131 @@ void launch_calibration()
 		}
 		else if (CALIBRATION_STEREO == operation_option)
 			{
-				//int argc;
-				//char* argv[6];
 
-				//argc = 6;
+				argc = 6;
 
 				//argv[] = malloc(sizeof(char*) * (argc + 1));
-				//argv[1] = "../src/imList.xml";
-				//argv[2] = "-w";
-				//argv[3] = "9";
-				//argv[4] = "-h";
-				//argv[5] = "6";
+				argv[1] = "../src/imList.xml";
+				argv[2] = "-w";
+				argv[3] = "9";
+				argv[4] = "-h";
+				argv[5] = "6";
 				//argv[6] = NULL;
-				//// not. argv[6] = "L";
-				//do_stereo_calib(argc, argv); // openCV demo code
+				// not. argv[6] = "L";
+				//
+				do_stereo_calib(argc, argv); // openCV demo code
 
 			}
-			else 
+			else if (CAPTURE_CALIBRATION_IMAGES == operation_option)
+					{		
+						
+						//
+						///**/argc = 11;
+						//argv[1] = "../run_inputs/opencv_example_frames/left03.jpg";
+						//argv[2] = "../run_inputs/opencv_example_frames/right03.jpg";
+						//argv[3] = "-i";
+						//argv[4] = "../data/intrinsics.yml";
+						//argv[5] = "-e";
+						//argv[6] = "extrinsics.yml";
+						//argv[7] = "-o";
+						//argv[8] = "../data/disp_out.jpg";
+						//argv[9] = "-p";
+						//argv[10] = "../data/points_out.yml";
+						//
+						//do_stereo_match(argc, argv); // openCV demo code
+						//waitKey();//6 0
+						//return 0;
+					}
+			else
 				std::cout << " the given selection is not defined : " << operation_option << std::endl;
 	
 
 }
+
+int initialize_vid_source()
+{
+	int	j = 0 ;   // general use cameras loop counter
+
+	if (thisStereo.input_source == STREAM_LIVE_FROM_STEREO)
+	{
+		for (j = 0; j < numOfActiveCams; j++)
+		{
+			thisStereo.cams[j] = VideoCapture(camIndexes[j]);		namedWindow(window_name[j], 1);
+			if (!thisStereo.cams[j].isOpened())  // check if we succeeded
+				return -1;
+
+			thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH , working_FRAME_WIDTH);
+			thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT, working_FRAME_HIGHT);
+
+			// record the stream and/or it's results
+			thisStereo.rec_videos[j].open(rec_file_name[j], REC_CODEC, REC_FPS, Size(working_FRAME_WIDTH, working_FRAME_HIGHT), true);  // bool isColor=true
+		}
+	}
+	else
+		if (thisStereo.input_source == RECORDED_VIDEOS_COUPLE)
+		{
+			for (j = 0; j < numOfActiveCams; j++)
+			{
+				thisStereo.cams[j] = VideoCapture(rec_file_name[j]);	namedWindow(window_name[j], 1);
+				if (!thisStereo.cams[j].isOpened())  // check if we succeeded
+					return -1;
+
+				thisStereo.vid_res[0]  = thisStereo.cams[0].get(CV_CAP_PROP_FRAME_WIDTH);
+				double frame_height   = thisStereo.cams[0].get(CV_CAP_PROP_FRAME_HEIGHT);
+				thisStereo.vid_len[j] = thisStereo.cams[j].get(CV_CAP_PROP_FRAME_COUNT);				
+			}
+		}
+}
+
+void capture_10_calibration_stereo_images() 
+{
+
+};
+
+void find_and_draw_chess(Mat img, String display_window_name= "corners")
+{
+	if (img.empty())
+		return;
+	Size imageSize = img.size();
+	Size boardSize(9, 6);
+
+	vector<Point2f> imagePoints;
+
+	bool found = false;
+	vector<Point2f>& corners =  imagePoints;// num of given frames
+	
+	{
+		Mat timg;
+		timg = img;
+		
+		found = findChessboardCorners(timg, boardSize, corners,
+			CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE);
+		/*
+		if (found)
+		  color the display windows frame in green, otherwise red or gray 
+		  */
+	}
+	/* displayCorners */
+	if (found)
+	{
+		Mat cimg, cimg1;
+		cvtColor(img, cimg, COLOR_GRAY2BGR);
+		drawChessboardCorners(cimg, boardSize, corners, found);
+		double sf = 640. / MAX(img.rows, img.cols);
+		resize(cimg, cimg1, Size(), sf, sf);
+		imshow(display_window_name, cimg1);//"corners"
+		//char c = (char)waitKey(500);
+		//if (c == 27 || c == 'q' || c == 'Q') //Allow ESC to quit
+		//	exit(-1);
+	}
+
+}
+
 //int new_argv()
 //{
 //	int i = 0;
 //	int new_argc = 0;
+
 //	char** tmp = new_args;
 //
 //	while (*tmp) {

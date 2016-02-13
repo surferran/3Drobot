@@ -1,3 +1,9 @@
+/*file : frameFunctions.h
+frame function
+
+chnge to hpp
+
+*/
 #include "opencv2/opencv.hpp"
 
 using namespace cv;

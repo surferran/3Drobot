@@ -15,10 +15,6 @@
 #include "working_consts.h"		// my added definitions, constants
 #include "utilFunctions.h"		// utility functions for the application.
 
-//#include ".\stereo_calib.cpp"
-////int do_stereo_calib(int argc, char** argv); // declare for the CPP already included file
-//int do_stereo_calib(int argc, char** argv);
-
 void process_frame(Mat *inFrame, Mat *outFrame)
 {
 	//rgb_frame_to_Edges(&frame[j], &edges);  // (in, out) Mat order
@@ -29,85 +25,21 @@ void process_frame(Mat *inFrame, Mat *outFrame)
 	// find edges
 	// check main areas
 	// remove background
-
 }
 
-//int main_notNow(int argc, char** argv)
 int main(int argc, char** argv)
 {
-	int	j = 0;   // general use cameras loop counter
-	VideoCapture	cams[numOfActiveCams];			// set the cameras buffers
-	VideoWriter     videos[numOfActiveCams];		// set the recordings buffers
-	Mat				raw_frame[numOfActiveCams];
-	Mat				modeified_frame;
-	int				frame_max[numOfActiveCams];		// used for playback  // TODO: put in a struct of CamProperties 
-	/*HINSTANCE hInstance, hPrevInstance;
-	LPTSTR    lpCmdLine;
-	int nCmdShow;
-	_tWinMain( hInstance,
-		 hPrevInstance,
-		    lpCmdLine,
-		       nCmdShow);*/
-	int maxVals[] = { 100,100 };
-	/*set_controls_gui(maxVals);
-	gui_example();*/
-	show_calibration_gui();
+	
+	
+	show_user_gui();
 
 	waitKey();
 	return 0;
-	//
-	//.. / src / imList.xml - w 9 - h 6
-	//
-	//
-	//do_stereo_calib(argc, argv); // openCV demo code
-	/*argc = 11;
-	argv[1] = "../run_inputs/opencv_example_frames/left03.jpg";
-	argv[2] = "../run_inputs/opencv_example_frames/right03.jpg";
-	argv[3] = "-i";
-	argv[4] = "../data/intrinsics.yml";
-	argv[5] = "-e";
-	argv[6] = "extrinsics.yml";
-	argv[7] = "-o";
-	argv[8] = "../data/disp_out.jpg";
-	argv[9] = "-p";
-	argv[10] = "../data/points_out.yml";
-	*/
-	//do_stereo_match(argc, argv); // openCV demo code
-	waitKey();//6 0
-	return 0;
+
 
 
 	//////////////////////////////
 
-	/* init the video sources , and set it's properties */
-	for (j = 0; j < numOfActiveCams; j++) 
-	{
-		//cams[j] = new CMyCam(j); // TODO : complete this option
-		///CMyCam cam1(1, SMALL);
-
-		if (working_mode == PLAYBACK)
-			{	cams[j] = VideoCapture(rec_file_name[j]);	namedWindow(window_name[j], 1);	}
-		else
-			{	cams[j] = VideoCapture(camIndexes[j]);		namedWindow(window_name[j], 1);	}
-		
-		if (!cams[j].isOpened())  // check if we succeeded
-			return -1;					// TODO : add error notice
-
-		if (working_mode == PLAYBACK) // set same resulution for all frames
-		{
-			double frame_width  = cams[0].get(CV_CAP_PROP_FRAME_WIDTH);
-			double frame_height = cams[0].get(CV_CAP_PROP_FRAME_HEIGHT);
-			frame_max[j]		= cams[j].get(CV_CAP_PROP_FRAME_COUNT);
-		}
-		else
-		{
-			cams[j].set(CV_CAP_PROP_FRAME_WIDTH , working_FRAME_WIDTH);
-			cams[j].set(CV_CAP_PROP_FRAME_HEIGHT, working_FRAME_HIGHT);
-
-			if (working_mode == REG_and_REC)
-				videos[j].open(rec_file_name[j], REC_CODEC, REC_FPS, Size(working_FRAME_WIDTH, working_FRAME_HIGHT), true);  // bool isColor=true
-		}
-	}
 //
 //	//only 1st time needed : 
 //	//// 	

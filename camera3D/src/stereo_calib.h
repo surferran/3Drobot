@@ -1,4 +1,4 @@
-#ifdef STEREO_CALIB_H
+#ifndef STEREO_CALIB_H
 #define STEREO_CALIB_H
 
 /* RAN note : practically a copy of the OpenCV example file 'stereo_calib.cpp' */

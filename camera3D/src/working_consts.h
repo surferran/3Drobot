@@ -26,23 +26,11 @@ const char rec_file_name[3][CHAR_LEN]	= { "output_1.avi" , "output_2.avi", "outp
 //const char rec_file_name[3][CHAR_LEN] = { "output_1.mp4" , "output_2.avi", "output_3.avi" };
 const char window_name[3][CHAR_LEN]		= { "out_1" , "out_2", "out_3" };
 
-const WORKING_MODES working_mode =  PLAYBACK;// REG_and_REC;//REGULAR; //
 const FRAME_SIZES	frame_size   = SMALL;
 
-const String STEREO_CALIBRATION_FILE_NAME = "mystereocalib.yml";
-//
-//struct CalibStruct {
-//	Mat
-//		CM1, CM2,
-//		D1, D2,
-//		R,
-//		T,
-//		E,
-//		F,
-//		R1, R2,
-//		P1, P2,
-//		Q;
-//};
+/* for util functions : */
+const String STEREO_CALIBRATION_IMAGES_LIST = "fileList.txt";	// will include files names in left-right pairs order
+const String STEREO_CALIBRATION_VIDEO_PAIR  = "output_#.avi";  // '#' will be 1,2 , respectivley for cams 0,1
 
 struct CalibStruct {
 	Size imSize;
@@ -58,6 +46,23 @@ struct CalibStruct {
 		Q;
 };
 
+struct StereoCams
+{
+	VIDEO_SOURCE	input_source;
+	VideoCapture	cams			[numOfActiveCams];			// set the cameras buffers. 0 for Left, 1 for Right
+	CalibStruct		calib_mtx		[numOfActiveCams];			// the calculated/pre-calculated cammeras parameters
+	VideoWriter     rec_videos		[numOfActiveCams];		// recordings buffers for stream_input recording
+
+	Mat				raw_frame		[numOfActiveCams];		// intermidiate buffer for capturing
+	Mat				modeified_frame	[numOfActiveCams];		// modified buffer for optional processing for each step
+
+	int				vid_len			[numOfActiveCams];		// relevant for pre-recorded input video
+	Size			vid_res			[numOfActiveCams];		// relevant for pre-recorded input video
+
+};
+
+StereoCams thisStereo;				// global 
+thisStereo.
 
 //---------------------------------------------------
 //
