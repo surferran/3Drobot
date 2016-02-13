@@ -15,7 +15,7 @@ const int working_FRAME_HIGHT	= 240;// 480;// 120;
 
 const int REC_FPS				= 30;	// 10 - will not record
 const int REC_CODEC				= CV_FOURCC('D', 'I', 'V', 'X') ; //CV_FOURCC('P', 'I', 'M', '1') ;
-const int loop_DELAY			= 3;	//  (int)1000 / REC_FPS; //33;// 10; // [ mS ]  -> 1000/# [Hz]
+const int loop_DELAY = 10;// 3;	//  (int)1000 / REC_FPS; //33;// 10; // [ mS ]  -> 1000/# [Hz]
 
 const int stitching_frame_rate			= 1 ; // 10;	// every # number of frames  - do stitch with previous one.
 const int stereo_stitching_frame_rate	= 50 ; // 10;	// every # number of frames  - do stitch between the two stereo ones.
@@ -31,6 +31,21 @@ const FRAME_SIZES	frame_size   = SMALL;
 /* for util functions : */
 const String STEREO_CALIBRATION_IMAGES_LIST = "fileList.txt";	// will include files names in left-right pairs order
 const String STEREO_CALIBRATION_VIDEO_PAIR  = "output_#.avi";  // '#' will be 1,2 , respectivley for cams 0,1
+
+															   /* constants */
+enum USER_STATUS_SELECTION {
+	CALIBRATION_RIGHT = 1,		// don't use it as a seperate mode
+	CALIBRATION_LEFT,		// don't use it as a seperate mode
+	CALIBRATION_STEREO,		// just use this one
+	CAPTURE_CALIBRATION_IMAGES,
+	STREAM_LIVE_FROM_STEREO
+};
+
+enum VIDEO_SOURCE {					// each 2 images will be populated from 
+	STREAM_STEREO_CAMS = 1,		// real-time capture 
+	RECORDED_VIDEOS_COUPLE,		// ready-made couple of video files
+	IMAGES_LIST							// pairs of pre-captured Left-Right images
+};
 
 struct CalibStruct {
 	Size imSize;
@@ -48,7 +63,7 @@ struct CalibStruct {
 
 struct StereoCams
 {
-	VIDEO_SOURCE	input_source;
+	VIDEO_SOURCE	input_source	;
 	VideoCapture	cams			[numOfActiveCams];			// set the cameras buffers. 0 for Left, 1 for Right
 	CalibStruct		calib_mtx		[numOfActiveCams];			// the calculated/pre-calculated cammeras parameters
 	VideoWriter     rec_videos		[numOfActiveCams];		// recordings buffers for stream_input recording
@@ -62,7 +77,7 @@ struct StereoCams
 };
 
 StereoCams thisStereo;				// global 
-thisStereo.
+
 
 //---------------------------------------------------
 //

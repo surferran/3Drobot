@@ -29,7 +29,8 @@ void process_frame(Mat *inFrame, Mat *outFrame)
 
 int main(int argc, char** argv)
 {
-	
+	/* global partial init */
+	thisStereo.input_source = STREAM_STEREO_CAMS;
 	
 	show_user_gui();
 

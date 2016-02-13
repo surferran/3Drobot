@@ -19,25 +19,13 @@ void on_BarChange_launch(int newPos);
 void show_calibration_gui();
 void launch_calibration();
 void set_controls_gui(int frameMax[]);
-
-/* constants */
-enum USER_STATUS_SELECTION {
-	CALIBRATION_RIGHT			= 1 ,		// don't use it as a seperate mode
-	CALIBRATION_LEFT				,		// don't use it as a seperate mode
-	CALIBRATION_STEREO				,		// just use this one
-	CAPTURE_CALIBRATION_IMAGES		,
-	STREAM_LIVE_FROM_STEREO
-};
-
-enum VIDEO_SOURCE {					// each 2 images will be populated from 
-	STREAM_STEREO_CAMS		= 1 ,		// real-time capture 
-	RECORDED_VIDEOS_COUPLE		,		// ready-made couple of video files
-	IMAGES_LIST							// pairs of pre-captured Left-Right images
-};
+int initialize_vid_source();
+void display_L_R_stream();
 
 /* globals */
 int operation_option = 0;
 int launch_status	 = 0;
+int stream_frame_index = 0;
 
 /* functions */
 void on_BarChange_user_selection(int newPos)// when changed by user or by software
@@ -53,8 +41,15 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 	if ((CALIBRATION_STEREO == operation_option) && (1 == launch_status))
 	{
 		std::cout << "user selected to launch calibration . starting.. " << std::endl;
-		launch_calibration();
+		launch_calibration();	// using saved files of calibration images. and saving matrices to files.
 	}
+	else
+		if ((CAPTURE_CALIBRATION_IMAGES == operation_option) && (1 == launch_status))
+		{
+			std::cout << "user selected to capture calibration images . starting.. " << std::endl;
+			initialize_vid_source();
+			display_L_R_stream();
+		}
 }
 
 void show_user_gui()
@@ -65,7 +60,7 @@ void show_user_gui()
 	int posTrackBar = 0;
 
 	//Create trackbars in this window
-	posTrackBar = cvCreateTrackbar("User_selection"			 , "User Controls", &operation_option	, 3, on_BarChange_user_selection);
+	posTrackBar = cvCreateTrackbar("User_selection"			 , "User Controls", &operation_option	, 4, on_BarChange_user_selection);
 	posTrackBar = cvCreateTrackbar("change to launch program", "User Controls", &launch_status		, 1, on_BarChange_launch);
 	// TODO: add text to show working directory. 
 			// and calibration files directory.
@@ -139,7 +134,7 @@ int initialize_vid_source()
 {
 	int	j = 0 ;   // general use cameras loop counter
 
-	if (thisStereo.input_source == STREAM_LIVE_FROM_STEREO)
+	if (thisStereo.input_source == STREAM_STEREO_CAMS)
 	{
 		for (j = 0; j < numOfActiveCams; j++)
 		{
@@ -162,12 +157,62 @@ int initialize_vid_source()
 				thisStereo.cams[j] = VideoCapture(rec_file_name[j]);	namedWindow(window_name[j], 1);
 				if (!thisStereo.cams[j].isOpened())  // check if we succeeded
 					return -1;
-
-				thisStereo.vid_res[0]  = thisStereo.cams[0].get(CV_CAP_PROP_FRAME_WIDTH);
-				double frame_height   = thisStereo.cams[0].get(CV_CAP_PROP_FRAME_HEIGHT);
-				thisStereo.vid_len[j] = thisStereo.cams[j].get(CV_CAP_PROP_FRAME_COUNT);				
+				
+				thisStereo.vid_res[j].width		= thisStereo.cams[j].get(CV_CAP_PROP_FRAME_WIDTH);
+				thisStereo.vid_res[j].height	= thisStereo.cams[j].get(CV_CAP_PROP_FRAME_HEIGHT);
+				thisStereo.vid_len[j]			= thisStereo.cams[j].get(CV_CAP_PROP_FRAME_COUNT);				
 			}
 		}
+		else
+		{
+			std::cout << " option of images list will be treated elsewhre " << std::endl;
+		}
+}
+
+void display_L_R_stream()
+{
+	int j = 0;
+	String framesCounterStr = "";
+
+	while (1)	// consider put in separate thread
+	{
+		for (j = 0; j < numOfActiveCams; j++) {
+
+			thisStereo.cams[j] >> thisStereo.raw_frame[j];					// get a new frame from camera #j
+
+			if (thisStereo.raw_frame[j].empty())
+			{
+				printf(" --(!) No captured frame -- Break!");
+				// add print on image screen
+				break;
+			}
+			else
+			{
+				if (j == 0) stream_frame_index++;
+
+				std::string text = "frames counter ";
+				text += std::to_string(stream_frame_index);
+				framesCounterStr = text;
+				// add seconds + mili since started , + FPS? + dark background
+
+				//display it as text
+				putText(thisStereo.raw_frame[j], framesCounterStr, cvPoint(30, 30),
+					FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200, 200, 250), 1, CV_AA);
+
+				// add check and display for the chessboard.
+
+				imshow(window_name[j], thisStereo.raw_frame[j]);		// TODO: consider displaying a modified frame
+
+				thisStereo.rec_videos[j].write(thisStereo.raw_frame[j]);  // do the recording
+
+				// add mouse capture for frames capturing to serial files
+			}
+		}
+		if ( (waitKey(loop_DELAY) >= 0))///(thisStereo.raw_frame[j].empty()) ||
+						break;
+	}
+
+	printf(" -- finished streaming -- ");
 }
 
 void capture_10_calibration_stereo_images() 
