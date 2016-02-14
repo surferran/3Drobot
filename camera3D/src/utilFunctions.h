@@ -12,6 +12,7 @@ So, in the above application, I have converted the color space of original image
 //////////
 
 #include "stereo_calib.h"
+#include "stereo_match.hpp"
 
 /* functions headers */
 void on_BarChange_user_selection(int newPos);
@@ -19,13 +20,17 @@ void on_BarChange_launch(int newPos);
 void show_calibration_gui();
 void launch_calibration();
 void set_controls_gui(int frameMax[]);
-int initialize_vid_source();
+int  initialize_vid_source();
 void display_L_R_stream();
+void setLabel(Mat& im, const std::string label, const Point& or );
+bool find_and_draw_chess(Mat img, String display_window_name , bool do_draw);
+void mouse_cb(int event, int x, int y, int flags, void* userdata);
 
-/* globals */
-int operation_option = 0;
-int launch_status	 = 0;
-int stream_frame_index = 0;
+/* globals */   // TODO : add explanations
+int operation_option	= 0;
+int launch_status		= 0;
+int stream_frame_index	= 0;
+bool user_requested		= true;
 
 /* functions */
 void on_BarChange_user_selection(int newPos)// when changed by user or by software
@@ -36,20 +41,83 @@ void on_BarChange_user_selection(int newPos)// when changed by user or by softwa
 }
 void on_BarChange_launch(int newPos)// when changed by user or by software
 {
+
+	int		argc;
+	char*	argv[11];  //6
+
 	launch_status		= newPos;
 	std::cout << "user changed launching control" << launch_status << std::endl;
-	if ((CALIBRATION_STEREO == operation_option) && (1 == launch_status))
+	if ((CAPTURE_CALIBRATION_IMAGES == operation_option) && (1 == launch_status))
 	{
-		std::cout << "user selected to launch calibration . starting.. " << std::endl;
-		launch_calibration();	// using saved files of calibration images. and saving matrices to files.
+		std::cout << "user selected to capture calibration images . starting.. " << std::endl;
+
+		initialize_vid_source();
+		display_L_R_stream();
 	}
 	else
-		if ((CAPTURE_CALIBRATION_IMAGES == operation_option) && (1 == launch_status))
+		if ((CALIBRATION_STEREO == operation_option) && (1 == launch_status))
 		{
-			std::cout << "user selected to capture calibration images . starting.. " << std::endl;
-			initialize_vid_source();
-			display_L_R_stream();
-		}
+			std::cout << "user selected to launch calibration . starting.. " << std::endl;
+			// using saved files of calibration images. and saving matrices to files.
+
+			argc = 6;
+
+			argv[1] = "../src/imList.xml";
+			argv[2] = "-w";
+			argv[3] = "6";// "9";
+			argv[4] = "-h";
+			argv[5] = "5";//  "6"; 
+
+			/*argv[1] = "../src/imList_OpenCV.xml";
+			argv[2] = "-w";
+			argv[3] =   "9";
+			argv[4] = "-h";
+			argv[5] =   "6"; */
+
+			do_stereo_calib(argc, argv); // openCV demo code. abit manipulated
+		} 	
+		else
+			if ( (STREAM_WITH_DISPARITY_AND_DEPTH == operation_option) && (1 == launch_status)) // rectification display
+			{
+				argc = 11;
+				argv[1] = "../run_inputs/captured_calibration_images/out_chess_3_1.jpg";  // left image
+				argv[2] = "../run_inputs/captured_calibration_images/out_chess_3_0.jpg";  // right image
+
+				//int color_mode = alg == STEREO_BM ? 0 : -1;
+				Mat img1 = imread(argv[1], -1);
+				Mat img2 = imread(argv[2], -1);
+				argv[3] = "-i";
+				argv[4] = "../data/intrinsics.yml";
+				argv[5] = "-e";
+				argv[6] = "extrinsics.yml";
+				argv[7] = "-o";
+				argv[8] = "../data/disp_out.jpg";
+				argv[9] = "-p";
+				argv[10] = "../data/points_out.yml";
+				
+				do_stereo_match(argc, argv, img1, img2); // openCV demo code
+			
+
+				initialize_vid_source();
+				display_L_R_stream();
+
+				//argv[1] = "../run_inputs/opencv_example_frames/left03.jpg";
+				//argv[2] = "../run_inputs/opencv_example_frames/right03.jpg";
+				//argv[3] = "-i";
+				//argv[4] = "../data/intrinsics.yml";
+				//argv[5] = "-e";
+				//argv[6] = "extrinsics.yml";
+				//argv[7] = "-o";
+				//argv[8] = "../data/disp_out.jpg";
+				//argv[9] = "-p";
+				//argv[10] = "../data/points_out.yml";
+				//
+				//do_stereo_match(argc, argv); // openCV demo code
+				//waitKey();//6 0
+				//return 0;
+			}
+			else
+				std::cout << " the given selection is not defined : " << operation_option << std::endl;
 }
 
 void show_user_gui()
@@ -67,69 +135,6 @@ void show_user_gui()
 			// and options possibilities (the enum)
 }
 
-void launch_calibration()
-{
-	enum USER_STATUS_SELECTION {
-		CALIBRATION_RIGHT = 1,		// don't use it as a seperate mode
-		CALIBRATION_LEFT,		// don't use it as a seperate mode
-		CALIBRATION_STEREO,	// just use this one
-		STREAM_LIVE_FROM_STEREO
-	};
-
-	int		argc;
-	char*	argv[6];
-
-	if (CALIBRATION_RIGHT == operation_option)
-	{
-
-	}
-	else if (CALIBRATION_LEFT == operation_option)
-		{
-
-		}
-		else if (CALIBRATION_STEREO == operation_option)
-			{
-
-				argc = 6;
-
-				//argv[] = malloc(sizeof(char*) * (argc + 1));
-				argv[1] = "../src/imList.xml";
-				argv[2] = "-w";
-				argv[3] = "9";
-				argv[4] = "-h";
-				argv[5] = "6";
-				//argv[6] = NULL;
-				// not. argv[6] = "L";
-				//
-				do_stereo_calib(argc, argv); // openCV demo code
-
-			}
-			else if (CAPTURE_CALIBRATION_IMAGES == operation_option)
-					{		
-						
-						//
-						///**/argc = 11;
-						//argv[1] = "../run_inputs/opencv_example_frames/left03.jpg";
-						//argv[2] = "../run_inputs/opencv_example_frames/right03.jpg";
-						//argv[3] = "-i";
-						//argv[4] = "../data/intrinsics.yml";
-						//argv[5] = "-e";
-						//argv[6] = "extrinsics.yml";
-						//argv[7] = "-o";
-						//argv[8] = "../data/disp_out.jpg";
-						//argv[9] = "-p";
-						//argv[10] = "../data/points_out.yml";
-						//
-						//do_stereo_match(argc, argv); // openCV demo code
-						//waitKey();//6 0
-						//return 0;
-					}
-			else
-				std::cout << " the given selection is not defined : " << operation_option << std::endl;
-	
-
-}
-
 int initialize_vid_source()
 {
 	int	j = 0 ;   // general use cameras loop counter
@@ -142,11 +147,25 @@ int initialize_vid_source()
 			if (!thisStereo.cams[j].isOpened())  // check if we succeeded
 				return -1;
 
-			thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH , working_FRAME_WIDTH);
-			thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT, working_FRAME_HIGHT);
+			if (CAPTURE_CALIBRATION_IMAGES == operation_option) {
+				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH	, 640);
+				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT	, 480);
+			}
+			else
+			{
+				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH	, working_FRAME_WIDTH);
+				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT	, working_FRAME_HIGHT);
+			}
+			//thisStereo.cams[j].set(CV_CAP_PROP_FPS, 30);
+			thisStereo.cams[j].set(CV_CAP_PROP_FPS, 15);
+			double tmp = thisStereo.cams[j].get(CV_CAP_PROP_FPS);
+			cout << "frame rate given as : " << tmp; // gives zero.. no support..
 
 			// record the stream and/or it's results
 			thisStereo.rec_videos[j].open(rec_file_name[j], REC_CODEC, REC_FPS, Size(working_FRAME_WIDTH, working_FRAME_HIGHT), true);  // bool isColor=true
+
+			// add mouse capture event. to engage 'user_request' as 'true'			 
+			setMouseCallback(window_name[j] , mouse_cb, NULL); // img for later - check area of image as button area.. (by adding relevant labels..)
 		}
 	}
 	else
@@ -171,14 +190,24 @@ int initialize_vid_source()
 
 void display_L_R_stream()
 {
-	int j = 0;
-	String framesCounterStr = "";
+	int		j = 0;
+	String	framesCounterStr = "";
+	bool	found_chess, total_chess_found;
+
+	stringstream	fileName;
+	int				output_frame_index = 0;
+
+	int		argc;
+	char*	argv[11];  
 
 	while (1)	// consider put in separate thread
 	{
+		total_chess_found = true;
 		for (j = 0; j < numOfActiveCams; j++) {
 
 			thisStereo.cams[j] >> thisStereo.raw_frame[j];					// get a new frame from camera #j
+
+			cvtColor(thisStereo.raw_frame[j], thisStereo.raw_frame[j], CV_BGR2GRAY); // change to GRAY
 
 			if (thisStereo.raw_frame[j].empty())
 			{
@@ -189,101 +218,142 @@ void display_L_R_stream()
 			else
 			{
 				if (j == 0) stream_frame_index++;
+				thisStereo.modeified_frame[j] = thisStereo.raw_frame[j].clone();
 
 				std::string text = "frames counter ";
 				text += std::to_string(stream_frame_index);
 				framesCounterStr = text;
-				// add seconds + mili since started , + FPS? + dark background
+				// add seconds + mili since started , + FPS? 
+				//display it as text label
+				setLabel(thisStereo.modeified_frame[j], framesCounterStr , cvPoint(10, 30));
 
-				//display it as text
-				putText(thisStereo.raw_frame[j], framesCounterStr, cvPoint(30, 30),
-					FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200, 200, 250), 1, CV_AA);
 
-				// add check and display for the chessboard.
+				if ((CAPTURE_CALIBRATION_IMAGES == operation_option)) {
+					// add check and display for the chessboard.
+					found_chess = find_and_draw_chess(thisStereo.modeified_frame[j], window_name[j], true);
+					if (!found_chess)
+						total_chess_found = false;
 
-				imshow(window_name[j], thisStereo.raw_frame[j]);		// TODO: consider displaying a modified frame
+					thisStereo.rec_videos[j].write(thisStereo.modeified_frame[j]);  // do the recording
+				}
+			
 
-				thisStereo.rec_videos[j].write(thisStereo.raw_frame[j]);  // do the recording
+				imshow(window_name[j], thisStereo.modeified_frame[j]);		// TODO: consider displaying a modified frame
 
-				// add mouse capture for frames capturing to serial files
 			}
 		}
-		if ( (waitKey(loop_DELAY) >= 0))///(thisStereo.raw_frame[j].empty()) ||
-						break;
+			
+		if ((STREAM_WITH_DISPARITY_AND_DEPTH == operation_option) && numOfActiveCams==2)
+		{
+
+			argc = 11;
+			argv[1] = "../run_inputs/captured_calibration_images/out_chess_3_1.jpg";  // left image
+			argv[2] = "../run_inputs/captured_calibration_images/out_chess_3_0.jpg";  // right image
+
+			//int color_mode = alg == STEREO_BM ? 0 : -1;
+			Mat img1 = thisStereo.modeified_frame[0];
+			Mat img2 = thisStereo.modeified_frame[1];
+			argv[3] = "-i";			argv[4]  = "../data/intrinsics.yml";
+			argv[5] = "-e";			argv[6]  = "extrinsics.yml";
+			argv[7] = "-o";			argv[8]  = "../data/disp_out.jpg";
+			argv[9] = "-p";			argv[10] = "../data/points_out.yml";
+
+			cout << "\n matching.. ";
+			do_stereo_match(argc, argv, img1, img2); // openCV demo code
+			cout << "\n done & displayed matches ";
+		}
+
+		// ask user to save pictures. using added mouse capture 
+		if (total_chess_found && user_requested) 
+		{			
+			user_requested = false;  // will need to press again mouse left button , to allow capture again
+
+			//cout << "\n user - please choose to keep those images or not \n";
+			//int c = waitKey();			//121-yes , 110 - not
+			//cout << "\n you chose : " << c;
+
+			/* save the images with serial number in file name */
+			output_frame_index++;
+			for (j = 0; j < numOfActiveCams; j++) { 
+				fileName.str(""); 
+				fileName << "../run_outputs/output_images/out_chess_" << output_frame_index << "_"<< j<< ".jpg" ;  //frameindex+j
+				imwrite(fileName.str(), thisStereo.raw_frame[j]);			//	 save the captured raw frames. without any drawings on it.
+			}
+			cout << "\n found and saved images "<< output_frame_index ;
+
+		}
+		if ( (waitKey(loop_DELAY) >= 0) ||
+			 (thisStereo.raw_frame[j].empty() && j < numOfActiveCams) )
+			break;
 	}
 
 	printf(" -- finished streaming -- ");
 }
+void setLabel(Mat& im, const std::string label, const Point& or )
+{
+	// from : http://answers.opencv.org/question/27695/puttext-with-black-background/
+	int fontface = cv::FONT_HERSHEY_SIMPLEX;
+	double scale = 0.4;
+	int thickness = 1;
+	int baseline = 0;
+
+	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
+	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
+	cv::putText(im, label, or , fontface, scale, CV_RGB(255, 255, 255), thickness, 8);
+	// consider:
+	//			putText(thisStereo.raw_frame[j], framesCounterStr, cvPoint(30, 30),
+	//				FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200, 200, 250), 1, CV_AA);
+}
+
 
 void capture_10_calibration_stereo_images() 
 {
 
 };
 
-void find_and_draw_chess(Mat img, String display_window_name= "corners")
+bool find_and_draw_chess(Mat img, String display_window_name= "corners", bool do_draw=true) // TODO: use pointers instead..
 {
 	if (img.empty())
-		return;
+		return false;
 	Size imageSize = img.size();
-	Size boardSize(9, 6);
+	Size boardSize(6, 5);	// for my toy chessboard card   // (9, 6); - for the openCV demo files
 
 	vector<Point2f> imagePoints;
 
 	bool found = false;
 	vector<Point2f>& corners =  imagePoints;// num of given frames
-	
-	{
-		Mat timg;
-		timg = img;
+	 
+	Mat timg;
+	timg = img;
 		
-		found = findChessboardCorners(timg, boardSize, corners,
-			CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE);
-		/*
-		if (found)
-		  color the display windows frame in green, otherwise red or gray 
-		  */
-	}
-	/* displayCorners */
+	found = findChessboardCorners(timg, boardSize, corners,
+		CALIB_CB_ADAPTIVE_THRESH | CALIB_CB_NORMALIZE_IMAGE);
+	/*
 	if (found)
+		color the display windows frame in green, otherwise red or gray 
+		*/
+ 
+	/* displayCorners */
+	if (found && do_draw) // found, and user desire to draw the findings
 	{
 		Mat cimg, cimg1;
-		cvtColor(img, cimg, COLOR_GRAY2BGR);
+		//cvtColor(img, cimg, COLOR_GRAY2BGR); // openCV example photos are gray ones
+		cimg = img;
 		drawChessboardCorners(cimg, boardSize, corners, found);
 		double sf = 640. / MAX(img.rows, img.cols);
 		resize(cimg, cimg1, Size(), sf, sf);
-		imshow(display_window_name, cimg1);//"corners"
-		//char c = (char)waitKey(500);
-		//if (c == 27 || c == 'q' || c == 'Q') //Allow ESC to quit
-		//	exit(-1);
+		imshow(display_window_name, cimg1); 
 	}
-
+	return found;
 }
 
-//int new_argv()
-//{
-//	int i = 0;
-//	int new_argc = 0;
-
-//	char** tmp = new_args;
-//
-//	while (*tmp) {
-//		++new_argc;
-//		++tmp;
-//	}
-//
-//	tmp = malloc(sizeof(char*) * (new_argc + 1));
-//	// if (!tmp) error_fail();
-//
-//	for (i = 0; i < new_argc; ++i) {
-//		tmp[i] = strdup(new_args[i]);
-//	}
-//	tmp[i] = NULL;
-//
-//	*pargv = tmp;
-//
-//	return new_argc;
-//}
-
+void mouse_cb(int event, int x, int y, int flags, void* userdata)
+{
+	if (event == EVENT_LBUTTONDOWN)
+	{
+		user_requested = true;	// for initiating calibration
+	}
+}
 ////////
 
 int iLastX = -1;
@@ -432,12 +502,14 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 	if (event == EVENT_LBUTTONDOWN)
 	{
-		cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
+		//cout << "Left button of the mouse is clicked - position (" << x << ", " << y << ")" << endl;
 		/*printf("%d %d: %d, %d, %d\n",
 			x, y,
 			(int)(*rgb).at<Vec3b>(y, x)[0],
 			(int)(*rgb).at<Vec3b>(y, x)[1],
 			(int)(*rgb).at<Vec3b>(y, x)[2]);*/
+
+		user_requested = true;	// for initiating calibration
 	}
 	else if (event == EVENT_RBUTTONDOWN)
 	{

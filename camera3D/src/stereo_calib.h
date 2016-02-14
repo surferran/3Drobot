@@ -46,8 +46,8 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
     }
 
 	bool displayCorners = true;// false;//true;
-    const int maxScale = 2;
-    const float squareSize = 1.f;  // Set this to your actual square size
+    const int maxScale = 2;		// verify need for this. better 1 ??
+	const float squareSize = 0.022;// [m] // TODO: bring this to outside !
     // ARRAY AND VECTOR STORAGE:
 
     vector<vector<Point2f> > imagePoints[2];

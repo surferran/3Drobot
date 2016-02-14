@@ -13,9 +13,9 @@ const int camIndexes[3]			= { 0, 1 , 2 };       // default : { 0, 1 , 2 };
 const int working_FRAME_WIDTH	= 320;// 640;// 160;
 const int working_FRAME_HIGHT	= 240;// 480;// 120;
 
-const int REC_FPS				= 30;	// 10 - will not record
+const int REC_FPS				= 15;// 30;	// 10 - will not record
 const int REC_CODEC				= CV_FOURCC('D', 'I', 'V', 'X') ; //CV_FOURCC('P', 'I', 'M', '1') ;
-const int loop_DELAY = 10;// 3;	//  (int)1000 / REC_FPS; //33;// 10; // [ mS ]  -> 1000/# [Hz]
+const int loop_DELAY = 75;// for 15fps ;// 34; // for camera highest frame rate	//  (int)1000 / REC_FPS; //33;// 10; // [ mS ]  -> 1000/# [Hz]
 
 const int stitching_frame_rate			= 1 ; // 10;	// every # number of frames  - do stitch with previous one.
 const int stereo_stitching_frame_rate	= 50 ; // 10;	// every # number of frames  - do stitch between the two stereo ones.
@@ -34,13 +34,13 @@ const String STEREO_CALIBRATION_VIDEO_PAIR  = "output_#.avi";  // '#' will be 1,
 
 															   /* constants */
 enum USER_STATUS_SELECTION {
-	CALIBRATION_RIGHT = 1,		// don't use it as a seperate mode
-	CALIBRATION_LEFT,		// don't use it as a seperate mode
-	CALIBRATION_STEREO,		// just use this one
-	CAPTURE_CALIBRATION_IMAGES,
-	STREAM_LIVE_FROM_STEREO
+	JUST_INITIALIZED	=	0 ,		 // mode 0 is the initialization. as NULL
+	CAPTURE_CALIBRATION_IMAGES	=	1,			// right - index 0, window title as 1. 	// left - index 1, window title as 2. 
+	CALIBRATION_STEREO,
+	STREAM_LIVE_FROM_STEREO,
+	STREAM_WITH_DISPARITY_AND_DEPTH
 };
-
+ 
 enum VIDEO_SOURCE {					// each 2 images will be populated from 
 	STREAM_STEREO_CAMS = 1,		// real-time capture 
 	RECORDED_VIDEOS_COUPLE,		// ready-made couple of video files

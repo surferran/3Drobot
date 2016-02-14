@@ -1,0 +1,27 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 2623-B768
+
+ Directory of C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\run_inputs\captured_calibration_images
+
+14/02/2016  01:13            33,417 out_chess_10_0.jpg
+14/02/2016  01:13            35,107 out_chess_10_1.jpg
+14/02/2016  01:09            28,879 out_chess_1_0.jpg
+14/02/2016  01:09            31,462 out_chess_1_1.jpg
+14/02/2016  01:10            30,499 out_chess_2_0.jpg
+14/02/2016  01:10            30,600 out_chess_2_1.jpg
+14/02/2016  01:10            33,241 out_chess_3_0.jpg
+14/02/2016  01:10            33,295 out_chess_3_1.jpg
+14/02/2016  01:11            29,416 out_chess_4_0.jpg
+14/02/2016  01:11            32,255 out_chess_4_1.jpg
+14/02/2016  01:11            31,912 out_chess_5_0.jpg
+14/02/2016  01:11            33,441 out_chess_5_1.jpg
+14/02/2016  01:11            31,731 out_chess_6_0.jpg
+14/02/2016  01:11            33,266 out_chess_6_1.jpg
+14/02/2016  01:12            35,391 out_chess_7_0.jpg
+14/02/2016  01:12            38,481 out_chess_7_1.jpg
+14/02/2016  01:13            39,242 out_chess_8_0.jpg
+14/02/2016  01:13            38,019 out_chess_8_1.jpg
+14/02/2016  01:13            34,443 out_chess_9_0.jpg
+14/02/2016  01:13            36,034 out_chess_9_1.jpg
+              20 File(s)        670,131 bytes
+               0 Dir(s)     406,327,296 bytes free
