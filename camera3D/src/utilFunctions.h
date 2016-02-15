@@ -22,7 +22,7 @@ void launch_calibration();
 void set_controls_gui(int frameMax[]);
 int  initialize_vid_source();
 void display_L_R_stream();
-void setLabel(Mat& im, const std::string label, const Point& or );
+Size setLabel(Mat& im, const std::string label, const Point& or );
 bool find_and_draw_chess(Mat img, String display_window_name , bool do_draw);
 void mouse_cb(int event, int x, int y, int flags, void* userdata);
 
@@ -97,7 +97,7 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 				
 				do_stereo_match(argc, argv, img1, img2); // openCV demo code
 			
-
+				return;
 				initialize_vid_source();
 				display_L_R_stream();
 
@@ -117,6 +117,11 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 				//return 0;
 			}
 			else
+				if ((STREAM_LIVE_FROM_STEREO == operation_option) && (1 == launch_status)) // rectification display
+				{
+					initialize_vid_source();
+					display_L_R_stream();
+				}
 				std::cout << " the given selection is not defined : " << operation_option << std::endl;
 }
 
@@ -124,6 +129,7 @@ void show_user_gui()
 {
 	String WinName = "User Controls";
 	namedWindow(WinName, CV_WINDOW_AUTOSIZE); //create a window 
+	Mat b_im(120, 340, CV_8UC3, Scalar(10, 10, 10));  // hight, width,type,.. //create_empty_image() 
 
 	int posTrackBar = 0;
 
@@ -133,6 +139,17 @@ void show_user_gui()
 	// TODO: add text to show working directory. 
 			// and calibration files directory.
 			// and options possibilities (the enum)
+
+	std::string text = " show stereo stream ";
+	Size boundary = setLabel(b_im, text, cvPoint(10, 30));  // return is w,h + l,top
+	//attach callback. or set boundaries for buttons table
+
+	 text = " capture calibration images from BW stream ";
+	 boundary = setLabel(b_im, text, cvPoint(10, 60));
+	//attach callback. or set boundaries for buttons table
+
+	imshow(WinName, b_im);
+
 }
 
 int initialize_vid_source()
@@ -147,11 +164,11 @@ int initialize_vid_source()
 			if (!thisStereo.cams[j].isOpened())  // check if we succeeded
 				return -1;
 
-			if (CAPTURE_CALIBRATION_IMAGES == operation_option) {
-				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH	, 640);
-				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT	, 480);
-			}
-			else
+		//	if (CAPTURE_CALIBRATION_IMAGES == operation_option) {
+		//		thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH	, 640);
+		//		thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT	, 480);
+		//	}
+		//	else
 			{
 				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_WIDTH	, working_FRAME_WIDTH);
 				thisStereo.cams[j].set(CV_CAP_PROP_FRAME_HEIGHT	, working_FRAME_HIGHT);
@@ -230,13 +247,14 @@ void display_L_R_stream()
 
 				if ((CAPTURE_CALIBRATION_IMAGES == operation_option)) {
 					// add check and display for the chessboard.
-					found_chess = find_and_draw_chess(thisStereo.modeified_frame[j], window_name[j], true);
-					if (!found_chess)
-						total_chess_found = false;
+			//		found_chess = find_and_draw_chess(thisStereo.modeified_frame[j], window_name[j], true);
+			//		if (!found_chess)
+			//			total_chess_found = false;
 
-					thisStereo.rec_videos[j].write(thisStereo.modeified_frame[j]);  // do the recording
+					thisStereo.rec_videos[j].write(thisStereo.raw_frame[j]);  // do the recording
 				}
 			
+			//		thisStereo.rec_videos[j].write(thisStereo.modeified_frame[j]);  // do the recording
 
 				imshow(window_name[j], thisStereo.modeified_frame[j]);		// TODO: consider displaying a modified frame
 
@@ -245,7 +263,6 @@ void display_L_R_stream()
 			
 		if ((STREAM_WITH_DISPARITY_AND_DEPTH == operation_option) && numOfActiveCams==2)
 		{
-
 			argc = 11;
 			argv[1] = "../run_inputs/captured_calibration_images/out_chess_3_1.jpg";  // left image
 			argv[2] = "../run_inputs/captured_calibration_images/out_chess_3_0.jpg";  // right image
@@ -289,7 +306,7 @@ void display_L_R_stream()
 
 	printf(" -- finished streaming -- ");
 }
-void setLabel(Mat& im, const std::string label, const Point& or )
+Size setLabel(Mat& im, const std::string label, const Point& or )
 {
 	// from : http://answers.opencv.org/question/27695/puttext-with-black-background/
 	int fontface = cv::FONT_HERSHEY_SIMPLEX;
@@ -297,12 +314,21 @@ void setLabel(Mat& im, const std::string label, const Point& or )
 	int thickness = 1;
 	int baseline = 0;
 
+	CvScalar black,red,green,blue,white;
+	black = CV_RGB(0, 0, 0);
+	red = CV_RGB(255, 0, 0);
+	green = CV_RGB(0, 255, 0);
+	blue = CV_RGB(0, 0, 255);
+	white = CV_RGB(0, 0, 0);
+
+
 	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
+	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), green, CV_FILLED);
 	cv::putText(im, label, or , fontface, scale, CV_RGB(255, 255, 255), thickness, 8);
 	// consider:
 	//			putText(thisStereo.raw_frame[j], framesCounterStr, cvPoint(30, 30),
 	//				FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200, 200, 250), 1, CV_AA);
+	return text;
 }
 
 

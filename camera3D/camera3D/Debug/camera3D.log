@@ -1,16 +1,6 @@
-﻿Build started 14/02/2016 04:14:00.
+﻿Build started 16/02/2016 01:05:45.
      1>Project "C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\camera3D\camera3D.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\MainFile.cpp
-         MainFile.cpp
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\stereo_calib.h(50): warning C4305: 'initializing': truncation from 'double' to 'float'
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(180): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(181): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(182): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(424): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(425): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\ran_the_user\documents\github\3drobot\camera3d\src\utilfunctions.h(189): warning C4715: 'initialize_vid_source': not all control paths return a value
-       Link:
+     1>Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.exe" /INCREMENTAL /NOLOGO opencv_calib3d300d.lib opencv_core300d.lib opencv_features2d300d.lib opencv_flann300d.lib opencv_hal300d.lib opencv_highgui300d.lib opencv_imgcodecs300d.lib opencv_imgproc300d.lib opencv_ml300d.lib opencv_objdetect300d.lib opencv_photo300d.lib opencv_shape300d.lib opencv_stitching300d.lib opencv_superres300d.lib opencv_ts300d.lib opencv_video300d.lib opencv_videoio300d.lib opencv_videostab300d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.pdb" /MAP:"ranMap" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.lib" /MACHINE:X86 Debug\MainFile.obj
          Debug\pwm.obj
          camera3D.vcxproj -> C:\Users\Ran_the_User\Documents\GitHub\3Drobot\camera3D\Debug\camera3D.exe
@@ -18,4 +8,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.22
+Time Elapsed 00:00:00.46

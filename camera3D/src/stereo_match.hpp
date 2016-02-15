@@ -245,6 +245,21 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
     bm->setSpeckleRange(32);
     bm->setDisp12MaxDiff(1);
 
+	// from ref web site :..
+	/*
+	sbm.state->SADWindowSize = 9;
+	sbm.state->numberOfDisparities = 112;
+	sbm.state->preFilterSize = 5;
+	sbm.state->preFilterCap = 61;
+	sbm.state->minDisparity = -39;
+	sbm.state->textureThreshold = 507;
+	sbm.state->uniquenessRatio = 0;
+	sbm.state->speckleWindowSize = 0;
+	sbm.state->speckleRange = 8;
+	sbm.state->disp12MaxDiff = 1;
+	*/
+	//
+
     sgbm->setPreFilterCap(63);
     int sgbmWinSize = SADWindowSize > 0 ? SADWindowSize : 3;
     sgbm->setBlockSize(sgbmWinSize);
@@ -260,6 +275,24 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
     sgbm->setSpeckleRange(32);
     sgbm->setDisp12MaxDiff(1);
     sgbm->setMode(alg == STEREO_HH ? StereoSGBM::MODE_HH : StereoSGBM::MODE_SGBM);
+
+	// from : http://www.jayrambhia.com/blog/disparity-maps/
+
+
+	//sgbm->setP1(600);   // 600
+	//sgbm->setP2(2400); //2400
+	//sgbm->setMinDisparity(-64);						// -64
+	//sgbm->setNumDisparities(numberOfDisparities);//192
+	//sgbm->setUniquenessRatio(1);	//1
+	//sgbm->setSpeckleWindowSize(150);//150
+	//sgbm->setSpeckleRange(2);//2
+	//sgbm->setDisp12MaxDiff(10);//10
+	//sgbm->setMode(alg == STEREO_HH ? StereoSGBM::MODE_HH : StereoSGBM::MODE_SGBM);
+/*
+	sgbm.SADWindowSize = 5;
+	sgbm.preFilterCap = 4;
+	sgbm.fullDP = false;
+*/
 
     Mat disp, disp8;
     Mat img1p, img2p, dispp;

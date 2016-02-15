@@ -7,9 +7,9 @@ ax      = fig.add_subplot(111, projection='3d')
 
 table = pd.read_table('points_out.yml' , sep=' ')
 print table.shape
-x = table.values[range(0,56000,100)  ,0]
-y = table.values[range(0,56000,100),1]
-z = table.values[range(0,56000,100),2]
+x = table.values[range(0,28123,100)  ,0]
+y = table.values[range(0,28123,100),1]
+z = table.values[range(0,28123,100),2]
 # x = table.values[range(0,156000,100)  ,0]
 # y = table.values[range(0,156000,100),1]
 # z = table.values[range(0,156000,100),2]
