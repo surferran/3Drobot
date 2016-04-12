@@ -268,12 +268,12 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
 
     sgbm->setP1(8*cn*sgbmWinSize*sgbmWinSize);
     sgbm->setP2(32*cn*sgbmWinSize*sgbmWinSize);
-    sgbm->setMinDisparity(0);
-    sgbm->setNumDisparities(numberOfDisparities);
-    sgbm->setUniquenessRatio(10);
-    sgbm->setSpeckleWindowSize(100);
-    sgbm->setSpeckleRange(32);
-    sgbm->setDisp12MaxDiff(1);
+    sgbm->setMinDisparity(-10);//0
+    sgbm->setNumDisparities(160);//numberOfDisparities
+    sgbm->setUniquenessRatio(50);//10
+    sgbm->setSpeckleWindowSize(10);//100
+    sgbm->setSpeckleRange(96);//32
+    sgbm->setDisp12MaxDiff(10);//1
     sgbm->setMode(alg == STEREO_HH ? StereoSGBM::MODE_HH : StereoSGBM::MODE_SGBM);
 
 	// from : http://www.jayrambhia.com/blog/disparity-maps/

@@ -47,6 +47,8 @@ enum VIDEO_SOURCE {					// each 2 images will be populated from
 	IMAGES_LIST							// pairs of pre-captured Left-Right images
 };
 
+enum CAM_INDECES {RIGHT_CAM=0, LEFT_CAM=1};
+
 struct CalibStruct {
 	Size imSize;
 	Mat

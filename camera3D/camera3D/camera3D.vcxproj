@@ -130,16 +130,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\BackgroundSub.hpp" />
     <ClInclude Include="..\src\frameFunctions.h" />
+    <ClInclude Include="..\src\GUI_functions.h" />
     <ClInclude Include="..\src\OdroidC1_handlers\pwm.h" />
     <ClInclude Include="..\src\stereo_calib.h" />
     <ClInclude Include="..\src\stereo_match.hpp" />
     <ClInclude Include="..\src\utilFunctions.h" />
     <ClInclude Include="..\src\working_consts.h" />
+    <ClInclude Include="Robot.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MainFile.cpp" />
     <ClCompile Include="..\src\OdroidC1_handlers\pwm.cpp" />
+    <ClCompile Include="Robot.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

@@ -32,6 +32,16 @@ int launch_status		= 0;
 int stream_frame_index	= 0;
 bool user_requested		= true;
 
+struct btn_strct
+{
+	int index;
+	String text;
+	int Val;
+	int x_min,x_max,y_min,y_max;
+};
+btn_strct btn_arr[5];
+///./btn_arr = new btn_strct[5];
+
 /* functions */
 void on_BarChange_user_selection(int newPos)// when changed by user or by software
 {
@@ -95,7 +105,7 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 				argv[9] = "-p";
 				argv[10] = "../data/points_out.yml";
 				
-				do_stereo_match(argc, argv, img1, img2); // openCV demo code
+				do_stereo_match(argc, argv, img1, img2); // openCV demo as base code
 			
 				return;
 				initialize_vid_source();
@@ -143,10 +153,28 @@ void show_user_gui()
 	std::string text = " show stereo stream ";
 	Size boundary = setLabel(b_im, text, cvPoint(10, 30));  // return is w,h + l,top
 	//attach callback. or set boundaries for buttons table
+	
+	btn_arr[0].index = 0;
+	btn_arr[0].text = text;
+	btn_arr[0].Val = 0;
+	btn_arr[0].x_min = 10;
+	btn_arr[0].x_max = 10 + boundary.width;
+	btn_arr[0].y_min = 30;
+	btn_arr[0].y_max = 30 + boundary.height;
+	/**/
+
 
 	 text = " capture calibration images from BW stream ";
 	 boundary = setLabel(b_im, text, cvPoint(10, 60));
 	//attach callback. or set boundaries for buttons table
+	 btn_arr[1].index = 1;
+	 btn_arr[1].text = text;
+	 btn_arr[1].Val = 0;
+	 btn_arr[1].x_min = 10;
+	 btn_arr[1].x_max = 10 + boundary.width;
+	 btn_arr[1].y_min = 30;
+	 btn_arr[1].y_max = 30 + boundary.height;
+	 /* when hover above - change background. (redisplay label with different bckg color )*/
 
 	imshow(WinName, b_im);
 

@@ -42,11 +42,23 @@
     <ClInclude Include="..\src\stereo_match.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\BackgroundSub.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Robot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\GUI_functions.h">
+      <Filter>Source Files\general</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MainFile.cpp" />
     <ClCompile Include="..\src\OdroidC1_handlers\pwm.cpp">
       <Filter>Source Files\hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Robot.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

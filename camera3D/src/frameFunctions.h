@@ -9,6 +9,20 @@ chnge to hpp
 using namespace cv;
 using namespace std;
 
+//
+//void process_frame(Mat *inFrame, Mat *outFrame)
+//{
+//	//rgb_frame_to_Edges(&frame[j], &edges);  // (in, out) Mat order
+//	//rgb_frame_reduce_Blue(&frame[j], &edges);  // (in, out) Mat order
+//	copy_frame	(inFrame, outFrame);
+//	// color_to_gray (..)
+//	// smooth image
+//	// find edges
+//	// check main areas
+//	// remove background
+//}
+//
+
 void copy_frame(Mat *inFrame, Mat *outFrame)
 {
 	*outFrame = *inFrame;
