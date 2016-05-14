@@ -45,9 +45,10 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
         return;
     }
 
-	bool displayCorners = true;// false;//true;
-    const int maxScale = 2;		// verify need for this. better 1 ??
-	const float squareSize = 0.022;// [m] // TODO: bring this to outside !
+	//RAN notes :
+	bool		displayCorners	= true;// false;//true;
+    const int	maxScale		= 1;//2		// verify need for this. better 1 ??
+	const float squareSize		= 3;//0.030;// [m] // TODO: bring this to outside !   30mm the template size
     // ARRAY AND VECTOR STORAGE:
 
     vector<vector<Point2f> > imagePoints[2];
@@ -66,6 +67,7 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
         {
             const string& filename = imagelist[i*2+k];
             Mat img = imread(filename, 0);
+			///cvtColor(img, img, CV_BGR2GRAY); // change to GRAY
             if(img.empty())
                 break;
             if( imageSize == Size() )
@@ -373,7 +375,7 @@ int do_stereo_calib(int argc, char** argv)
     }
 
     vector<string> imagelist;
-    bool ok = readStringList(imagelistfn, imagelist);
+    bool ok = readStringList(imagelistfn, imagelist); 
     if(!ok || imagelist.empty())
     {
         cout << "can not open " << imagelistfn << " or the string list is empty" << endl;

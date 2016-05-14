@@ -10,6 +10,8 @@ But HSV color space is the most suitable color space for color based image segme
 So, in the above application, I have converted the color space of original image of the video from BGR to HSV image
 */
 //////////
+#ifndef UTIL_FUNCS_H
+#define UTIL_FUNCS_H
 
 #include "stereo_calib.h"
 #include "stereo_match.hpp"
@@ -135,6 +137,7 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 				std::cout << " the given selection is not defined : " << operation_option << std::endl;
 }
 
+
 void show_user_gui()
 {
 	String WinName = "User Controls";
@@ -150,6 +153,9 @@ void show_user_gui()
 			// and calibration files directory.
 			// and options possibilities (the enum)
 
+
+	//setMouseCallback( "CamShift Demo", onMouse, 0 );
+
 	std::string text = " show stereo stream ";
 	Size boundary = setLabel(b_im, text, cvPoint(10, 30));  // return is w,h + l,top
 	//attach callback. or set boundaries for buttons table
@@ -162,7 +168,7 @@ void show_user_gui()
 	btn_arr[0].y_min = 30;
 	btn_arr[0].y_max = 30 + boundary.height;
 	/**/
-
+	
 
 	 text = " capture calibration images from BW stream ";
 	 boundary = setLabel(b_im, text, cvPoint(10, 60));
@@ -184,7 +190,7 @@ int initialize_vid_source()
 {
 	int	j = 0 ;   // general use cameras loop counter
 
-	if (thisStereo.input_source == STREAM_STEREO_CAMS)
+	if (thisStereo.input_source ==  LIVE_CAM)/// STREAM_STEREO_CAMS)
 	{
 		for (j = 0; j < numOfActiveCams; j++)
 		{
@@ -214,7 +220,7 @@ int initialize_vid_source()
 		}
 	}
 	else
-		if (thisStereo.input_source == RECORDED_VIDEOS_COUPLE)
+		if (thisStereo.input_source == RECORDED_VIDEO_FILE)
 		{
 			for (j = 0; j < numOfActiveCams; j++)
 			{
@@ -337,25 +343,34 @@ void display_L_R_stream()
 Size setLabel(Mat& im, const std::string label, const Point& or )
 {
 	// from : http://answers.opencv.org/question/27695/puttext-with-black-background/
-	int fontface = cv::FONT_HERSHEY_SIMPLEX;
-	double scale = 0.4;
+	// other nice ref: http://stackoverflow.com/questions/33937800/how-to-make-a-simple-window-with-one-button-using-opencv-highgui-only 
+	int fontface	= cv::FONT_HERSHEY_SIMPLEX;
+	double scale	= 0.6;//0.4;
 	int thickness = 1;
 	int baseline = 0;
 
-	CvScalar black,red,green,blue,white;
-	black = CV_RGB(0, 0, 0);
-	red = CV_RGB(255, 0, 0);
-	green = CV_RGB(0, 255, 0);
-	blue = CV_RGB(0, 0, 255);
-	white = CV_RGB(0, 0, 0);
-
+	CvScalar black,red,green,blue,white,dark, myTextColor;
+	black	= CV_RGB(0, 0, 0);
+	red		= CV_RGB(255, 0, 0);
+	green	= CV_RGB(0, 255, 0);
+	blue	= CV_RGB(0, 0, 255);
+	white	= CV_RGB(0, 0, 0);
+	dark	= CV_RGB(50, 50, 50);
+	myTextColor = CV_RGB(250, 150, 250);
 
 	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), green, CV_FILLED);
-	cv::putText(im, label, or , fontface, scale, CV_RGB(255, 255, 255), thickness, 8);
+	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), dark, CV_FILLED);
+	cv::putText(im, label, or , fontface , scale, myTextColor , thickness, 8);
 	// consider:
 	//			putText(thisStereo.raw_frame[j], framesCounterStr, cvPoint(30, 30),
 	//				FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(200, 200, 250), 1, CV_AA);
+
+	/*
+	Mat instructions = Mat::zeros(100,300,CV_8UC3);
+	putText(instructions, "Press 'i' to start tracking", Point(50,50),
+		FONT_HERSHEY_TRIPLEX, 0.5, Scalar(100,255,0), 1, CV_AA);
+	imshow("Instructions",instructions);
+*/
 	return text;
 }
 
@@ -591,3 +606,5 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 		cout << "Mouse is moved over the window while pressing ALT key - position (" << x << ", " << y << ")" << endl;
 	}
 }
+
+#endif

@@ -1,14 +1,18 @@
 #ifndef WORKING_CONSTS_H
 #define WORKING_CONSTS_H
-
+/* 
+file that contains all working parameters and constants.
+*/
 using namespace cv;
 
 enum WORKING_MODES	{ CALIBRATION=0, REGULAR  , REG_and_REC , PLAYBACK }; //  REGULAR(=no recording) 
 enum FRAME_SIZES	{ SMALL=0, MEDIUM , LARGE};
 
-const int numOfActiveCams		= 2;// 2;// use the first # of the next indeces list :
+const int numOfActiveCams		= 1;// use the first # of the next indeces list :
+const int camIndexes[3]			= { 0,1 , 2 };       // default : { 0, 1 , 2 };
 
-const int camIndexes[3]			= { 0, 1 , 2 };       // default : { 0, 1 , 2 };
+//const int numOfActiveCams		= 2;// 2;// use the first # of the next indeces list :
+//const int camIndexes[3]			= { 1 , 2,0 };       // default : { 0, 1 , 2 };
 
 const int working_FRAME_WIDTH	= 320;// 640;// 160;
 const int working_FRAME_HIGHT	= 240;// 480;// 120;
@@ -40,11 +44,17 @@ enum USER_STATUS_SELECTION {
 	STREAM_LIVE_FROM_STEREO,
 	STREAM_WITH_DISPARITY_AND_DEPTH
 };
- 
-enum VIDEO_SOURCE {					// each 2 images will be populated from 
-	STREAM_STEREO_CAMS = 1,		// real-time capture 
-	RECORDED_VIDEOS_COUPLE,		// ready-made couple of video files
-	IMAGES_LIST							// pairs of pre-captured Left-Right images
+// 
+//enum VIDEO_SOURCE {					// each 2 images will be populated from 
+//	STREAM_STEREO_CAMS = 1,		// real-time capture 
+//	RECORDED_VIDEOS_COUPLE,		// ready-made couple of video files
+//	IMAGES_LIST							// pairs of pre-captured Left-Right images
+//};
+
+enum VIDEO_SOURCE {					// each 1 or 2 image frames will be populated from 
+	LIVE_CAM			= 0	,		// real-time capture 
+	RECORDED_VIDEO_FILE		,		// ready-made (couple) of video files
+	IMAGES_LIST						// pairs of pre-captured (Left-Right) images
 };
 
 enum CAM_INDECES {RIGHT_CAM=0, LEFT_CAM=1};
