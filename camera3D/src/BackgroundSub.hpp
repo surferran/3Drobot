@@ -37,7 +37,27 @@ static void drawShapesContours(Mat& image, const vector<vector<Point> >& ShapesC
 
 	imshow("Capture ", image);
 }
+void doMYbsManipulation( Mat & mask)
+{
+	// ref: http://answers.opencv.org/question/460/finding-centroid-of-a-mask/ 
+	//		https://en.wikipedia.org/wiki/Image_moment
+	//		https://en.wikipedia.org/wiki/Image_moment#Examples_2
+	static int frame_counter=0;
 
+	Moments m = moments(mask, false);	// points moment 
+	Point p1(m.m10/m.m00, m.m01/m.m00); // mass_centers
+
+	double rCircle = sqrt(m.m00/3.14)/13 ; //10~  // estimated rounding circle for the object area
+	circle(mask, p1, rCircle, Scalar(128,220,220), 3); 
+
+	double theta = 0.5 * atan2(2*m.m11, m.m20-m.m02) * 57.3;
+	//double lamda = ( m.m20 + m.m02)*0.5 +  
+	frame_counter++;
+	if (frame_counter % 5)
+		cout << frame_counter << " : " << theta << endl;//Mat(p1) << endl;
+	imshow("Foreground debug", mask);
+
+}
 int show_forgnd_and_bgnd()
 {
     VideoCapture			cap;
@@ -53,6 +73,7 @@ int show_forgnd_and_bgnd()
 	Rect					rect;
 
 	cv::Ptr<BackgroundSubtractorMOG2> mog = createBackgroundSubtractorMOG2(330, 16.0, false);
+	////Ptr<BackgroundSubtractorKNN> mog = createBackgroundSubtractorKNN(330, 16.0, false);
 	Scalar					random_color;
 	int						loopWait = 0;
 	RNG						rng(12345);
@@ -80,7 +101,7 @@ int show_forgnd_and_bgnd()
 
     namedWindow( "Capture "		, CV_WINDOW_AUTOSIZE);
     namedWindow( "Foreground "	, CV_WINDOW_AUTOSIZE );
-
+	namedWindow( "Foreground debug"	, CV_WINDOW_AUTOSIZE );
     for(;;)
     {
 		/* get new frame */
@@ -94,12 +115,15 @@ int show_forgnd_and_bgnd()
 
 		/* apply background substraction and manipulate the resultant frame */
 		mog->apply(frame,foreground); 
+		imshow("Foreground debug",foreground); //debugging
 
         threshold	(foreground,	foreground,	128,	255,THRESH_BINARY);//28,128,198
         medianBlur	(foreground,	foreground,	3);//9
         erode		(foreground,	foreground,	Mat());
         dilate		(foreground,	foreground,	Mat());
 
+		// ---now 'foreground' it is a workable image binary--- // 
+		doMYbsManipulation(foreground.clone());
 		// find contours and store them all as a list
 		findContours(foreground.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);// See squares.c in the OpenCV sample directory.
 		found_contours_num = contours.size();

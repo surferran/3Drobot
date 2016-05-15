@@ -16,8 +16,8 @@ bool backprojMode = false;
 bool selectObject = false;
 int trackObject = -1;
 bool showHist = true;
-Point origin;
-Rect selection;
+Point origin ;
+Rect selection; 
 int vmin = 10, vmax = 256, smin = 30;
 
 static void onMouse( int event, int x, int y, int, void* )
@@ -47,7 +47,7 @@ static void onMouse( int event, int x, int y, int, void* )
     }
 }
 
-static void help()
+static void help_camshift()
 {
     cout << "\nThis is a demo that shows mean-shift based tracking\n"
             "You select a color objects such as your face and it tracks it.\n"
@@ -74,7 +74,7 @@ int do_camshift_main()
 
    trackObject = 0;
 
-    help();
+    help_camshift();
 
     VideoCapture cap;
     Rect trackWindow;
@@ -88,7 +88,7 @@ int do_camshift_main()
 
     if( !cap.isOpened() )
     {
-        help();
+        help_camshift();
         cout << "***Could not initialize capturing...***\n";
         cout << "Current parameter's value: \n";
         ///parser.printMessage();

@@ -113,7 +113,9 @@ int main_14(){
 
 		//we can loop the video by re-opening the capture every time the video reaches its last frame
 
-		capture.open("bouncingBall.avi");
+		capture.open("../src/externals/bouncingBall.avi");
+//		capture.open("../src/externals/cars.avi");
+
 
 		if(!capture.isOpened()){
 			cout<<"ERROR ACQUIRING VIDEO FEED\n";

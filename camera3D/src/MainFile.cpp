@@ -21,9 +21,10 @@
 // http://blog.christianperone.com/2015/01/real-time-drone-object-tracking-using-python-and-opencv/ !, add gradient hist/info of the object
 // look at : https://www.youtube.com/watch?v=kxsvG4sSuvA 
 
+
  /* my  constants and parameters */
 // bounds in percent from image size
-#define MIN_MOVED_AREA_in_image 33//.0//23
+#define MIN_MOVED_AREA_in_image 33//33//.0//23
 #define MAX_MOVED_AREA_in_image 95.0
 #define NUM_OF_PIXELS_IN_FRAME	(640.0*480.0)
 #define MIN_CURVE_AREA			MIN_MOVED_AREA_in_image/100*NUM_OF_PIXELS_IN_FRAME
@@ -43,32 +44,47 @@
 
 #include "GUI_functions.h"
 
-
-
 //#include "externals\objectTrackingTut.cpp"
 //#include "externals\multipleObjectTracking.cpp"
 //#include "externals\motionTracking_myChanges.cpp"
-#include "externals\motionTracking_ver14.cpp"
+///#include "externals\motionTracking_ver14.cpp"
 ////#include "externals\stereoBMTuner-1.0\StereoBMTuner\stereoBMTuner.h"
+///-- to do by ver 3.1. : #include "externals\akaze.cpp"  //300416
+///#include "C:\opencv3_1\opencv-master\samples\cpp\tutorial_code\features2D\AKAZE_tracking\planar_tracking.cpp"
+//#include "C:\opencv3_1\opencv-master\samples\cpp\convexhull.cpp"////////
 
+// also : https://en.wikipedia.org/wiki/Image_moment#Examples_2
 #include "camshiftdemo.cpp"
 
+#include "stereo_calib.h"
+//#include ".\kalman.cpp"
 
+//
+//#include <windows.h>
+//using namespace cv;
+//using namespace std;
 
-int main(int argc, char** argv){
-	/* global partial init */
-	//do_track_subject(argc, argv);
-	//do_track_mult();
-	//main_track();
-	//main_14
+////when need to eliminate the consule that is opened in parallel 
+//#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
+int main(int argc, char** argv)
+//int main(int argc, char** argv)
+{
+	thisStereo.input_source =LIVE_CAM;
+	
+
+	/*initialize_vid_source();
+	display_L_R_stream();
+	return 0;*/
+
+	show_buttons_gui();
+	
 	//ask_user_for_video_source();	// get file name or open camera0 (+1 later for stereo)
 	string	base_out_file_path	= "C:/Users/Ran_the_User/Documents/Technion_Studies/IP_STUFF/video_4_testing/out";
 	string	framesCounterStr	= ""	, base_file_name = "" , file_full_name="", file_suffix = ".*";	
 	int		stream_frame_index	= 0;
 	char	rec_file_name[150] = "C:/Users/Ran_the_User/Documents/Technion_Studies/IP_STUFF/video_4_testing/in/VID_3D_scenario/output_1.avi";
 	VideoCapture vid = VideoCapture(rec_file_name);	
-	namedWindow("sensing user keys here", 1);
 
 	int		loop_delay = 33 ; //[ms]	// need to fit the file recording value
 	char	user_pressing=0;	// just optional.
@@ -76,11 +92,30 @@ int main(int argc, char** argv){
 	if( !vid.isOpened() )
 		return -1;
 
-	plotWindows[0] = "win1 - raw image";
+	plotWindowsNames[0] = "win1 - raw image";
+	plotWindowsNames[1] = "win2 - left stereo image";
+	plotWindowsNames[2] = "win3 - right stereo image";
+	plotWindowsNames[3] = "win4 - calculated disparity";
+	plotWindowsNames[4] = "win5 - background substruction output";
 
 	while (1)
 	{
-		if (op_flags.reset_vid_file_location)
+		if (op_flags.make_stereo_calibration)
+		{		
+			argc = 6;
+			argv[1] = "-w";  argv[2] = "8";
+			argv[3] = "-h";  argv[4] = "6";
+			argv[5] = "../run_inputs/stereo_calibration_images/stereo_calib.xml";
+			do_stereo_calib(argc, argv);
+			op_flags.make_stereo_calibration	=	false;
+		}
+
+		if (op_flags.calc_background_subs)
+		{
+			show_forgnd_and_bgnd();
+		}
+
+		if (op_flags.reset_vid_file_location) // TODO: verify source is file and not camera.
 		{
 			vid.set(CAP_PROP_POS_FRAMES,0);	// go back to first frame
 			op_flags.reset_identification	 = true;
@@ -91,15 +126,31 @@ int main(int argc, char** argv){
 			op_flags.reset_identification	= false;
 		}
 		if (op_flags.play_on){
-			vid >> images[0];
-			if (images[0].empty())
+
+			vid >> plotImages[0];
+			if (plotImages[0].empty())
 				op_flags.play_on = false;
 			else
 			{					
-				imshow(plotWindows[0], images[0]); 
+				imshow(plotWindowsNames[0], plotImages[0]); 
 				if (op_flags.make_camshift)
-					do_camshift_on_Single_current_frame(&images[0]); 
+					do_camshift_on_Single_current_frame(&plotImages[0]); 
+
+				if (op_flags.show_stereo) /// TODO!!
+				{
+					imshow(plotWindowsNames[1], plotImages[0]);
+				//	imshow(plotWindowsNames[2], plotImages[1]);
+					/*plot_images[2] = calc_disparity();
+					imshow(plotWindowsNames[3], plotImages[2]);*/
+
+				}
+				if (op_flags.show_vid_source_selection)
+				{
+					
+				}
 			}
+
+
 		}
 		
 		if (!check_user_input(&loop_delay, &user_pressing))
@@ -120,7 +171,7 @@ int main(int argc, char** argv){
 
 	/////////////////////////////////////////////////////
 
-	thisStereo.input_source = STREAM_STEREO_CAMS;
+	thisStereo.input_source = LIVE_CAM;
 	
 	show_user_gui();
 
@@ -128,5 +179,10 @@ int main(int argc, char** argv){
 
 	destroyAllWindows();
 	return 0;
+	/* global partial init */
+	//do_track_subject(argc, argv);
+	//do_track_mult();
+	//main_track();
+	//main_14
 	//////////////////////////////////////////////////////
 }
