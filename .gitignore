@@ -2,6 +2,9 @@
 Thumbs.db
 ehthumbs.db
 
+#RAN additions
+*.zip
+
 # Folder config file
 Desktop.ini
 
