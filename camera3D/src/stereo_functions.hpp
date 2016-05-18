@@ -41,45 +41,70 @@ static void saveXYZ(const char* filename, const Mat& mat)
     fclose(fp);
 }
 
-int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
+class myLocalDisparity
 {
+public:
+
+	myLocalDisparity(){};
+	int do_stereo_match_init(int argc, char** argv);
+	int do_stereo_match( Mat imgR, Mat imgL , Mat& disp8 );
+private:
     const char* algorithm_opt = "--algorithm=";
     const char* maxdisp_opt   = "--max-disparity=";
     const char* blocksize_opt = "--blocksize=";
     const char* nodisplay_opt = "--no-display";
     const char* scale_opt	  = "--scale=";
 
-    if(argc < 3)
+    const char* intrinsic_filename		= 0;
+    const char* extrinsic_filename		= 0;
+    const char* disparity_filename		= 0;
+    const char* point_cloud_filename	= 0;
+
+    enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3 };
+    int		alg				= STEREO_SGBM;
+    int		SADWindowSize	= 0, numberOfDisparities = 0;
+    bool	no_display		= false;
+    float	scale			= 1.f;
+
+    Ptr<StereoBM>	bm		= StereoBM::create(16,9);
+    Ptr<StereoSGBM> sgbm	= StereoSGBM::create(0,16,3);
+
+	Mat M1, D1, M2, D2;
+	Mat R, T, R1, P1, R2, P2;
+
+	Mat map11, map12, map21, map22;
+	Mat img1r, img2r;
+	Mat img1 ;
+	Mat img2 ;
+	Rect roi1, roi2;
+	Mat Q;
+};
+
+int myLocalDisparity::do_stereo_match_init(int argc, char** argv)
+{  
+	if(argc < 3)
     {
         print_helpM();
         return 0;
-    }
-    const char* img1_filename = 0;
-    const char* img2_filename = 0;
-    const char* intrinsic_filename = 0;
-    const char* extrinsic_filename = 0;
-    const char* disparity_filename = 0;
-    const char* point_cloud_filename = 0;
+    } 
 
-    enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3 };
-    int alg = STEREO_SGBM;
-    int SADWindowSize = 0, numberOfDisparities = 0;
-    bool no_display = false;
-    float scale = 1.f;
+	alg				= STEREO_SGBM;
+	SADWindowSize	= 0;
+	numberOfDisparities = 0;
+	no_display		= false;
+	scale			= 1.f;
 
-    Ptr<StereoBM> bm = StereoBM::create(16,9);
-    Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);
-
-    for( int i = 1; i < argc; i++ )
+    for( int i = 1+2; i < argc; i++ )
     {
-        if( argv[i][0] != '-' )
-        {
-            if( !img1_filename )
-                img1_filename = argv[i];
-            else
-                img2_filename = argv[i];
-        }
-        else if( strncmp(argv[i], algorithm_opt, strlen(algorithm_opt)) == 0 )
+        //if( argv[i][0] != '-' )
+        //{
+        //  /*  if( !img1_filename )
+        //        img1_filename = argv[i];
+        //    else
+        //        img2_filename = argv[i];*/
+        //}
+        //else 
+		if( strncmp(argv[i], algorithm_opt, strlen(algorithm_opt)) == 0 )
         {
             char* _alg = argv[i] + strlen(algorithm_opt);
             alg = strcmp(_alg, "bm") == 0   ? STEREO_BM :
@@ -89,7 +114,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
             if( alg < 0 )
             {
                 printf("Command-line parameter error: Unknown stereo algorithm\n\n");
-                print_help();
+                //print_help();
                 return -1;
             }
         }
@@ -99,7 +124,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
                 numberOfDisparities < 1 || numberOfDisparities % 16 != 0 )
             {
                 printf("Command-line parameter error: The max disparity (--maxdisparity=<...>) must be a positive integer divisible by 16\n");
-                print_help();
+                //print_help();
                 return -1;
             }
         }
@@ -132,17 +157,11 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
             point_cloud_filename = argv[++i];
         else
         {
-            printf("Command-line parameter error: unknown option %s\n", argv[i]);
-            return -1;
+            printf("Command-line parameter error: unknown option %d %s\n", i, argv[i]);
+            //return -1;
         }
     }
-
-    if( !img1_filename || !img2_filename )
-    {
-        printf("Command-line parameter error: both left and right images must be specified\n");
-        return -1;
-    }
-
+ 
     if( (intrinsic_filename != 0) ^ (extrinsic_filename != 0) )
     {
         printf("Command-line parameter error: either both intrinsic and extrinsic parameters must be specified, or none of them (when the stereo pair is already rectified)\n");
@@ -155,11 +174,42 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
         return -1;
     }
 
-    int color_mode = alg == STEREO_BM ? 0 : -1;
-    //Mat img1 = imread(img1_filename, color_mode);
-    //Mat img2 = imread(img2_filename, color_mode);
-	Mat img1 = imgR;
-	Mat img2 = imgL;
+	if( intrinsic_filename )
+	{
+		// reading intrinsic parameters
+		FileStorage fs(intrinsic_filename, FileStorage::READ);
+		if(!fs.isOpened())
+		{
+			printf("Failed to open file %s\n", intrinsic_filename);
+			return -1;
+		}
+
+		fs["M1"] >> M1;
+		fs["D1"] >> D1;
+		fs["M2"] >> M2;
+		fs["D2"] >> D2;
+
+		M1 *= scale;
+		M2 *= scale;
+
+		fs.open(extrinsic_filename, FileStorage::READ);
+		if(!fs.isOpened())
+		{
+			printf("Failed to open file %s\n", extrinsic_filename);
+			return -1;
+		}
+
+		fs["R"] >> R;
+		fs["T"] >> T;
+	}
+
+	return 0;
+}
+
+int myLocalDisparity::do_stereo_match(Mat imgR, Mat imgL , Mat& disp8 )
+{
+	img1 = imgR.clone();
+	img2 = imgL.clone();
 
     if (img1.empty())
     {
@@ -172,7 +222,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
         return -1;
     }
 
-    if (scale != 1.f)
+ /*   if (scale != 1.f)
     {
         Mat temp1, temp2;
         int method = scale < 1 ? INTER_AREA : INTER_CUBIC;
@@ -180,50 +230,17 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
         img1 = temp1;
         resize(img2, temp2, Size(), scale, scale, method);
         img2 = temp2;
-    }
+    }*/
 
     Size img_size = img1.size();
 
-    Rect roi1, roi2;
-    Mat Q;
-
     if( intrinsic_filename )
     {
-        // reading intrinsic parameters
-        FileStorage fs(intrinsic_filename, FileStorage::READ);
-        if(!fs.isOpened())
-        {
-            printf("Failed to open file %s\n", intrinsic_filename);
-            return -1;
-        }
-
-        Mat M1, D1, M2, D2;
-        fs["M1"] >> M1;
-        fs["D1"] >> D1;
-        fs["M2"] >> M2;
-        fs["D2"] >> D2;
-
-        M1 *= scale;
-        M2 *= scale;
-
-        fs.open(extrinsic_filename, FileStorage::READ);
-        if(!fs.isOpened())
-        {
-            printf("Failed to open file %s\n", extrinsic_filename);
-            return -1;
-        }
-
-        Mat R, T, R1, P1, R2, P2;
-        fs["R"] >> R;
-        fs["T"] >> T;
-
         stereoRectify( M1, D1, M2, D2, img_size, R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY, -1, img_size, &roi1, &roi2 );
 
-        Mat map11, map12, map21, map22;
         initUndistortRectifyMap(M1, D1, R1, P1, img_size, CV_16SC2, map11, map12);
         initUndistortRectifyMap(M2, D2, R2, P2, img_size, CV_16SC2, map21, map22);
 
-        Mat img1r, img2r;
         remap(img1, img1r, map11, map12, INTER_LINEAR);
         remap(img2, img2r, map21, map22, INTER_LINEAR);
 
@@ -232,6 +249,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
     }
 
     numberOfDisparities = numberOfDisparities > 0 ? numberOfDisparities : ((img_size.width/8) + 15) & -16;
+	numberOfDisparities = 112;
 
     bm->setROI1(roi1);
     bm->setROI2(roi2);
@@ -294,7 +312,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
 	sgbm.fullDP = false;
 */
 
-    Mat disp, disp8;
+    Mat disp;//, disp8;
     Mat img1p, img2p, dispp;
     copyMakeBorder(img1, img1p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
     copyMakeBorder(img2, img2p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
@@ -328,6 +346,7 @@ int do_stereo_match(int argc, char** argv, Mat imgR, Mat imgL)
 
     if(point_cloud_filename)
     {
+		// save to file with low priority. or frequencty.  need to estimate self position
         printf("storing the point cloud...");
         fflush(stdout);
         Mat xyz;

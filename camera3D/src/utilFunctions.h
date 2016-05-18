@@ -14,7 +14,7 @@ So, in the above application, I have converted the color space of original image
 #define UTIL_FUNCS_H
 
 #include "stereo_calib.h"
-#include "stereo_match.hpp"
+//#include "stereo_match.hpp"
 
 /* functions headers */
 void on_BarChange_user_selection(int newPos);
@@ -44,6 +44,16 @@ struct btn_strct
 btn_strct btn_arr[5];
 ///./btn_arr = new btn_strct[5];
 
+class frame_source
+{
+	VIDEO_SOURCE source_type ;
+	frame_source(){
+		source_type = LIVE_CAM;
+	}
+	void init(); //open source and check for isOpen
+	void grab_frame(); //get a pointer to frame or 2 (mono/image, stereo)
+};
+
 /* functions */
 void on_BarChange_user_selection(int newPos)// when changed by user or by software
 {
@@ -51,6 +61,40 @@ void on_BarChange_user_selection(int newPos)// when changed by user or by softwa
 	operation_option	= newPos;
 	std::cout << "user changed selection " << operation_option << std::endl;
 }
+
+
+myLocalDisparity localDisp;
+
+
+void do_stereo_disp_init(){
+
+	int		argc;
+	char*	argv[11];  //6
+
+	argc = 11; 
+
+	argv[3] = "-i";
+	argv[4] = "../data/intrinsics.yml";
+	argv[5] = "-e";
+	argv[6] =			"extrinsics.yml"; 
+	////outputs:
+	//argv[7] = "-o";	argv[8]  = "../data/disp_out.jpg";
+	//argv[9] = "-p";	argv[10] = "../data/points_out.yml";
+	//outputs:
+	argv[7] = "--no-display";	argv[8]  = "";
+	argv[9] = "";	argv[10] = "";
+	localDisp.do_stereo_match_init (argc,argv);
+}
+
+void do_stereo_disp(Mat imgR, Mat imgL, Mat& outM){
+
+	//inputs:
+	Mat img1 = imgR.clone();
+	Mat img2 = imgL.clone();
+
+	localDisp.do_stereo_match( img1, img2, outM); // openCV demo as base code
+}
+
 void on_BarChange_launch(int newPos)// when changed by user or by software
 {
 
@@ -91,23 +135,7 @@ void on_BarChange_launch(int newPos)// when changed by user or by software
 		else
 			if ( (STREAM_WITH_DISPARITY_AND_DEPTH == operation_option) && (1 == launch_status)) // rectification display
 			{
-				argc = 11;
-				argv[1] = "../run_inputs/captured_calibration_images/out_chess_3_1.jpg";  // left image
-				argv[2] = "../run_inputs/captured_calibration_images/out_chess_3_0.jpg";  // right image
-
-				//int color_mode = alg == STEREO_BM ? 0 : -1;
-				Mat img1 = imread(argv[1], -1);
-				Mat img2 = imread(argv[2], -1);
-				argv[3] = "-i";
-				argv[4] = "../data/intrinsics.yml";
-				argv[5] = "-e";
-				argv[6] = "extrinsics.yml";
-				argv[7] = "-o";
-				argv[8] = "../data/disp_out.jpg";
-				argv[9] = "-p";
-				argv[10] = "../data/points_out.yml";
-				
-				do_stereo_match(argc, argv, img1, img2); // openCV demo as base code
+				////do_stereo_disp();
 			
 				return;
 				initialize_vid_source();
@@ -304,13 +332,14 @@ void display_L_R_stream()
 			//int color_mode = alg == STEREO_BM ? 0 : -1;
 			Mat img1 = thisStereo.modeified_frame[0];
 			Mat img2 = thisStereo.modeified_frame[1];
+			Mat outM;
 			argv[3] = "-i";			argv[4]  = "../data/intrinsics.yml";
 			argv[5] = "-e";			argv[6]  = "extrinsics.yml";
 			argv[7] = "-o";			argv[8]  = "../data/disp_out.jpg";
 			argv[9] = "-p";			argv[10] = "../data/points_out.yml";
 
 			cout << "\n matching.. ";
-			do_stereo_match(argc, argv, img1, img2); // openCV demo code
+			///do_stereo_match(argc, argv, img1, img2, outM); // openCV demo code
 			cout << "\n done & displayed matches ";
 		}
 
@@ -345,9 +374,9 @@ Size setLabel(Mat& im, const std::string label, const Point& or )
 	// from : http://answers.opencv.org/question/27695/puttext-with-black-background/
 	// other nice ref: http://stackoverflow.com/questions/33937800/how-to-make-a-simple-window-with-one-button-using-opencv-highgui-only 
 	int fontface	= cv::FONT_HERSHEY_SIMPLEX;
-	double scale	= 0.6;//0.4;
-	int thickness = 1;
-	int baseline = 0;
+	double scale	= 0.6;	
+	int thickness	= 1;
+	int baseline	= 0;
 
 	CvScalar black,red,green,blue,white,dark, myTextColor;
 	black	= CV_RGB(0, 0, 0);
@@ -358,6 +387,7 @@ Size setLabel(Mat& im, const std::string label, const Point& or )
 	dark	= CV_RGB(50, 50, 50);
 	myTextColor = CV_RGB(250, 150, 250);
 
+	//consider put the text alligned to middle
 	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
 	cv::rectangle(im, or +cv::Point(0, baseline), or +cv::Point(text.width, -text.height), dark, CV_FILLED);
 	cv::putText(im, label, or , fontface , scale, myTextColor , thickness, 8);

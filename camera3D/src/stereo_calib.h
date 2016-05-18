@@ -164,7 +164,9 @@ StereoCalib(const vector<string>& imagelist, Size boardSize, bool useCalibrated=
                     TermCriteria(TermCriteria::COUNT+TermCriteria::EPS, 100, 1e-5) );
     cout << "done with RMS error=" << rms << endl;
 
+	/////////////////////////////////////////////////////
 // CALIBRATION QUALITY CHECK
+	/////////////////////////////////////////////////////
 // because the output fundamental matrix implicitly
 // includes all the output information,
 // we can check the quality of calibration using the
@@ -326,6 +328,9 @@ static bool readStringList( const string& filename, vector<string>& l )
     return true;
 }
 
+/*
+calibrate stereo cameras , by pairs of pre-captured images. listed in given .xml file
+*/
 int do_stereo_calib(int argc, char** argv)
 {
     Size boardSize;

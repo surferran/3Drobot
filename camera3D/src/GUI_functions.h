@@ -21,12 +21,13 @@ enum USER_CHOISE  {
 };
 
 struct Operation_flags{
-	bool play_on				=	false;
-	bool show_stereo			=	false;
+	bool make_stereo_calibration=	false;
 	bool calc_background_subs	=	false;
 	bool show_vid_source_selection =false;
 
-	bool make_stereo_calibration=	false;
+	bool show_stereo			=	false;
+	bool play_on				=	false;
+
 	bool make_camshift			=	false;
 
 	bool reset_vid_file_location =	false;
@@ -68,7 +69,7 @@ static void onMousePress( int event, int x, int y, int, void* )
 		LastMousePressPos		= Point(x,y);
 		userMouseBtnSelection	= -1;
 
-		for (int i=0 ; i<3; i++){   //buttons_num//TODO: seperate for each gui window.
+		for (int i=0 ; i<4; i++){   //buttons_num//TODO: seperate for each gui window.
 			if ( LastMousePressPos.inside (boundRect[i]) )
 			{
 				printf("indeed %d index \n",i); //TODO: update in 'status'  line/section
@@ -87,7 +88,7 @@ static void onMousePress2( int event, int x, int y, int, void* )
 		LastMousePressPos		= Point(x,y);
 		userMouseBtnSelection	= -1;
 
-		for (int i=3 ; i<buttons_num; i++){
+		for (int i=4 ; i<buttons_num; i++){
 			if ( LastMousePressPos.inside (boundRect[i]) )
 			{
 				printf("indeed %d index \n",i); //TODO: update in 'status'  line/section
@@ -130,8 +131,6 @@ bool check_user_input(int* waiting_delay, char* c)
 	switch (userMouseBtnSelection)
 	{
 	case 1: 
-		//// start the displays and wait for tracking		
-		//op_flags.show_stereo = true;
 		op_flags.make_stereo_calibration = true;
 		userMouseBtnSelection=-1;
 		break;
@@ -144,6 +143,11 @@ bool check_user_input(int* waiting_delay, char* c)
 	case 3:// choose vid source
 		op_flags.show_vid_source_selection = true;
 		show_vidSource_options_gui();		
+		userMouseBtnSelection=-1;
+		break;
+	case 4:// show video panels
+		   //// start the displays and wait for tracking		
+		op_flags.show_stereo = true;
 		userMouseBtnSelection=-1;
 		break;
 	case 31:
@@ -173,14 +177,15 @@ bool check_user_input(int* waiting_delay, char* c)
 void show_buttons_gui()
 {
 	String WinName	= "User controls"; // buttons,status text
+	int num_of_displayed_btns = 4;
 	std::string text[buttons_num];
 	text[0]			= " stereo calibration procedure ";// for stereo. by pre-set images and xml file";
-		//" show stereo stream ";
-	//text[1]			= " capture calibration images from BW stream ";
+		//" show stereo stream "; 
 	text[1]			= " calculate background substruction ";//maximum length string
 	text[2]			= " select video source ";
-	Mat all_btns_im	(100*1.5,  250*1.5 , CV_8UC3, Scalar(10 , 10 , 10 ));   // hight, width,type,.. //create_empty_image() 
-	Mat btn_im		( 20*1.5,  240*1.5 , CV_8UC3, Scalar(30, 30, 30));  // hight, width,type,.. //create_empty_image() 
+				/// 4->num_of_displayed_btns
+	Mat all_btns_im	(10+30*1.5*4,  250*1.5 , CV_8UC3, Scalar(10 , 10 , 10 ));   // hight, width,type,.. //create_empty_image() 
+	Mat btn_im		( 20*1.5	,  240*1.5 , CV_8UC3, Scalar(30, 30, 30));  // hight, width,type,.. //create_empty_image() 
 	Mat clear_btn_im ;
 	btn_im.copyTo(clear_btn_im);
 	int originX	,	originY	;
@@ -219,6 +224,15 @@ void show_buttons_gui()
 	originX			= 10 ;
 	originY			= 10+30*1.5*2 ;
 	boundRect[2]	= Rect (originX - 3, originY - 5, originX + 310*1.5, originY + 10*1.5);	//x,y,w,h
+	roi				= Rect( Point( originX, originY ), btn_im.size() );
+	btn_im.copyTo( all_btns_im( roi ) );
+	clear_btn_im.copyTo(btn_im);
+
+	text[3]			= " start video panel ";
+	setLabel(btn_im, text[3], cvPoint(text_in_label_location_X, text_in_label_location_Y));	
+	originX			= 10 ;
+	originY			= 10+30*1.5*3 ;
+	boundRect[3]	= Rect (originX - 3, originY - 5, originX + 310*1.5, originY + 10*1.5);	//x,y,w,h
 	roi				= Rect( Point( originX, originY ), btn_im.size() );
 	btn_im.copyTo( all_btns_im( roi ) );
 	clear_btn_im.copyTo(btn_im);
